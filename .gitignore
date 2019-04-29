@@ -18,3 +18,4 @@ project/plugins/project/
 
 # Scala-IDE specific
 .scala_dependencies
+src/main/resources/glove.42B.300d.txt
