@@ -14,5 +14,6 @@ libraryDependencies ++= Seq(
   "org.clulab" %% "processors-modelscorenlp" % "7.5.1",
   "org.clulab" %% "processors-modelsmain" % "7.5.1",
   "org.clulab" %% "fatdynet" % "0.2.0",
-  "org.scalatest" %% "scalatest" % "3.0.1" % "test"
+  "org.scalatest" %% "scalatest" % "3.0.1" % "test",
+  "org.clulab" %% "factuality-models" % "0.1.0"
 )

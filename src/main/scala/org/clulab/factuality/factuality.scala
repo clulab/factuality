@@ -134,6 +134,8 @@ class Factuality {
 
       val p = sent(1).toInt   //p is the position of predicate in the sentence, start from 0
       val words = sent.slice(2,sent.length)
+
+      // the input of predict function is in the format of (sentence words, predicate position)
       val pred = predict(words, p)
       preds += pred
 
@@ -312,7 +314,7 @@ class LstmParameters(
 object Factuality {
   val logger:Logger = LoggerFactory.getLogger(classOf[Factuality])
 
-  val EPOCHS = 20
+  val EPOCHS = 1
   val RANDOM_SEED = 2522620396l // used for both DyNet, and the JVM seed for shuffling data
   val DROPOUT_PROB = 0.1f
   val DO_DROPOUT = true
@@ -547,7 +549,7 @@ object Factuality {
       
       // one sentence can conatin more than one predicates that annotated with factuality
       // convert to format Array[String]: position_predicate, factuality, sentence words
-      val trainSentences = sentences2instances(rawtrainSentences)
+      val trainSentences = sentences2Instances(rawtrainSentences)
 
 
       var rawdevSentences = ColumnReader.readColumns(props.getProperty("dev"))
@@ -556,7 +558,7 @@ object Factuality {
 //        else
 //          None
 
-      val devSentences = sentences2instances(rawdevSentences)
+      val devSentences = sentences2Instances(rawdevSentences)
 
       val embeddingsFile = props.getProperty("embed")
 
@@ -574,7 +576,7 @@ object Factuality {
       logger.debug("Starting evaluation procedure...")
       // val testSentences = ColumnReader.readColumns(props.getProperty("test"))
       val rawtestSentences = ColumnReader.readColumns(props.getProperty("test"))
-      val testSentences = sentences2instances(rawtestSentences)
+      val testSentences = sentences2Instances(rawtestSentences)
 
       val rnn = Factuality(props.getProperty("model"))
       rnn.evaluate(testSentences)
@@ -594,7 +596,9 @@ object Factuality {
 
   }
 
-  def sentences2instances(rawSentences: Array[Array[Row]]): Array[Array[String]] = {
+  def sentences2Instances(rawSentences: Array[Array[Row]]): Array[Array[String]] = {
+    // convert to the format that each line corresponds to one predicate,
+    // specifically, each line is in the format of [factuality socre, predicate position, words in sentence] 
 
     val sentences = new ArrayBuffer[Array[String]]()
 

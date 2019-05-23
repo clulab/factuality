@@ -1,0 +1,60 @@
+➜  factuality git:(master) ✗ sbt 'runMain org.clulab.factuality.Factuality -train src/main/resources/train.conll -dev src/main/resources/dev.conll -test src/main/resources/test.conll -model fact -embed src/main/resources/glove.42B.300d.txt' 
+[info] Loading project definition from /Users/fan/Documents/RA/factuality/clulab/factuality/project
+[info] Loading settings from build.sbt ...
+[info] Set current project to factuality (in build file:/Users/fan/Documents/RA/factuality/clulab/factuality/)
+[info] Running org.clulab.factuality.Factuality -train src/main/resources/train.conll -dev src/main/resources/dev.conll -test src/main/resources/test.conll -model fact -embed src/main/resources/glove.42B.300d.txt
+Using the following properties:
+	dev = src/main/resources/dev.conll
+	model = fact
+	train = src/main/resources/train.conll
+	test = src/main/resources/test.conll
+	embed = src/main/resources/glove.42B.300d.txt
+00:27:09.040 [run-main-0] DEBUG org.clulab.factuality.Factuality - Starting training procedure...
+00:27:10.552 [run-main-0] DEBUG org.clulab.factuality.Factuality - Loading embeddings from file src/main/resources/glove.42B.300d.txt...
+00:27:10.564 [run-main-0] DEBUG o.c.embeddings.word2vec.Word2Vec - Started to load word2vec matrix from file src/main/resources/glove.42B.300d.txt...
+00:29:17.503 [run-main-0] DEBUG o.c.embeddings.word2vec.Word2Vec - Completed matrix loading.
+00:29:19.360 [run-main-0] DEBUG o.c.embeddings.word2vec.Word2Vec - Completed matrix loading.
+00:29:19.360 [run-main-0] DEBUG org.clulab.factuality.Factuality - Completed loading embeddings for a vocabulary of size 1917494.
+00:29:27.047 [run-main-0] DEBUG org.clulab.factuality.Factuality - Word vocabulary has 1917495 entries (including 1 for unknown).
+00:29:27.047 [run-main-0] DEBUG org.clulab.factuality.Factuality - Character vocabulary has 91 entries.
+00:29:27.047 [run-main-0] DEBUG org.clulab.factuality.Factuality - Initializing DyNet...
+[dynet] random seed: 2522620396
+[dynet] allocating memory: 512MB
+[dynet] memory allocation done.
+00:29:36.833 [run-main-0] DEBUG org.clulab.factuality.Factuality - Created parameters.
+00:29:36.834 [run-main-0] DEBUG org.clulab.factuality.Factuality - Initializing DyNet embedding parameters...
+00:30:06.960 [run-main-0] DEBUG org.clulab.factuality.Factuality - Completed initializing embedding parameters for a vocabulary of size 1917494.
+00:30:06.960 [run-main-0] DEBUG org.clulab.factuality.Factuality - Completed initialization.
+00:30:06.978 [run-main-0] INFO  org.clulab.factuality.Factuality - Started epoch 0.
+00:31:35.118 [run-main-0] INFO  org.clulab.factuality.Factuality - Cummulative loss: 1260.2268161230527
+00:33:04.177 [run-main-0] INFO  org.clulab.factuality.Factuality - Cummulative loss: 1008.7064723052081
+00:34:58.870 [run-main-0] INFO  org.clulab.factuality.Factuality - Cummulative loss: 867.725894135394
+00:36:26.919 [run-main-0] INFO  org.clulab.factuality.Factuality - Cummulative loss: 775.0597236897556
+00:38:01.369 [run-main-0] INFO  org.clulab.factuality.Factuality - Cummulative loss: 856.2843788064007
+00:39:25.070 [run-main-0] INFO  org.clulab.factuality.Factuality - Cummulative loss: 849.1039495302184
+00:40:58.385 [run-main-0] INFO  org.clulab.factuality.Factuality - Cummulative loss: 783.8090682733716
+00:42:25.463 [run-main-0] INFO  org.clulab.factuality.Factuality - Cummulative loss: 746.2010522890557
+00:43:53.382 [run-main-0] INFO  org.clulab.factuality.Factuality - Cummulative loss: 701.3996395275927
+00:45:17.843 [run-main-0] INFO  org.clulab.factuality.Factuality - Cummulative loss: 702.046878418126
+00:46:50.745 [run-main-0] INFO  org.clulab.factuality.Factuality - Cummulative loss: 712.1684456585273
+00:48:14.703 [run-main-0] INFO  org.clulab.factuality.Factuality - Cummulative loss: 637.1786274869371
+00:49:40.679 [run-main-0] INFO  org.clulab.factuality.Factuality - Cummulative loss: 710.8283953839967
+00:51:07.191 [run-main-0] INFO  org.clulab.factuality.Factuality - Cummulative loss: 680.3547538839268
+00:52:32.735 [run-main-0] INFO  org.clulab.factuality.Factuality - Cummulative loss: 714.387496995324
+00:53:54.078 [run-main-0] INFO  org.clulab.factuality.Factuality - Cummulative loss: 707.44527664996
+00:55:13.000 [run-main-0] INFO  org.clulab.factuality.Factuality - Cummulative loss: 705.3387083807335
+00:56:38.482 [run-main-0] INFO  org.clulab.factuality.Factuality - Cummulative loss: 663.60785038389
+00:58:02.711 [run-main-0] INFO  org.clulab.factuality.Factuality - Cummulative loss: 711.8510474430801
+00:59:22.918 [run-main-0] INFO  org.clulab.factuality.Factuality - Cummulative loss: 730.665984846276
+01:00:49.857 [run-main-0] INFO  org.clulab.factuality.Factuality - Cummulative loss: 669.7007574372819
+01:02:17.226 [run-main-0] INFO  org.clulab.factuality.Factuality - Cummulative loss: 692.486661202033
+01:02:26.416 [run-main-0] DEBUG org.clulab.factuality.Factuality - Started evaluation on the development dataset...
+01:03:57.190 [run-main-0] INFO  org.clulab.factuality.Factuality - Mean absolute error (MAE) on development sentences: 1.056847530612433
+01:03:57.190 [run-main-0] INFO  org.clulab.factuality.Factuality - Pearson correlation coefficient (r) on development sentences: 0.755091395259426
+01:08:21.390 [run-main-0] DEBUG org.clulab.factuality.Factuality - Starting evaluation procedure...
+WARNING: Attempting to initialize dynet twice. Ignoring duplicate initialization.
+01:08:37.224 [run-main-0] DEBUG org.clulab.factuality.Factuality - Created parameters.
+01:18:26.990 [run-main-0] DEBUG org.clulab.factuality.Factuality - Started evaluation on the testing dataset...
+01:19:57.820 [run-main-0] INFO  org.clulab.factuality.Factuality - Mean absolute error (MAE) on testing sentences: 1.0584262142316616
+01:19:57.820 [run-main-0] INFO  org.clulab.factuality.Factuality - Pearson correlation coefficient (r) on testing sentences: 0.7476409331177547
+[success] Total time: 3215 s, completed May 1, 2019 1:20:19 AM
