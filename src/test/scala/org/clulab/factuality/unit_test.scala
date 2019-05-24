@@ -31,8 +31,7 @@ class TestFactuality extends FlatSpec with Matchers {
 
   // sci dataset
   "Factuality" should "be 3 as definitedly happened if the predicate is in the form of -ed and in a descriptive statment" in {
-    val text_tokenization = "(0,Parthenolide,NN), (1,induced,VBD), (2,apoptosis,NN), (3,and,CC), (4,inhibited,VBD), (5,cell,NN), (6,proliferation,NN), (7,and,CC), (8,the,DT), (9,expression,NN), (10,of,IN), (11,VEGF,NN), (12,in,FW), (13,vitro,FW), (14,.,.)"
-    val words = tokenization2words(text_tokenization)
+    val words = Array("Parthenolide", "induced", "apoptosis", "and", "inhibited", "cell", "proliferation", "and", "the", "expression", "of", "VEGF", "in", "vitro", ".")
     val p = 1
     val gold_fact = 3.0
     val pred_fact = rnn.predict(words, p)
@@ -133,7 +132,7 @@ class TestFactuality extends FlatSpec with Matchers {
     val words = new ArrayBuffer[String]()
     val tokens = tokenization.split(' ')    //such as: (1,induced,VBD)
     for(t <- tokens) {
-        if(t.split(',').size != 0){
+        if(t.split(',')(1)!= ""){
           words += t.split(',')(1)
         }
         else{
