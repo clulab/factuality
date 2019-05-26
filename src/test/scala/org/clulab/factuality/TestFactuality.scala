@@ -50,7 +50,7 @@ class TestFactuality extends FlatSpec with Matchers {
   }
 
   it should "be 3 as definitedly happened if the predicate is a noun and in a descriptive statment" in {
-    val text_tokenization = "(0,Silencing,NN), (1,of,IN), (2,HDAC7,NN), (3,in,IN), (4,the,DT), (5,breast,NN), (6,cancer,NN), (7,cell,NN), (8,line,NN), (9,MCF7,NN), (10,negatively,RB), (11,influences,VBZ), (12,17-beta-estradiol,JJ), (13,(,-LRB-), (14,E2,NN), (15,)-mediated,-RRB-), (16,repression,NN), (17,of,IN), (18,RPRM,NNP), (19,,,,), (20,as,RB), (21,well,RB), (22,as,IN), (23,that,DT), (24,of,IN), (25,other,JJ), (26,E2,NN), (27,repressed,VBD), (28,genes,NNS), (29,such,JJ), (30,as,IN), (31,ENC1,NN), (32,,,,), (33,NEDD9,NN), (34,,,,), (35,OPG,NNP), (36,,,,), (37,CXCR4,NN), (38,and,CC), (39,CERK,NN), (40,.,.)"
+    val text_tokenization = "(0,In,IN), (1,most,JJS), (2,cases,NNS), (3,cPLA2,NN), (4,is,VBZ), (5,upregulated,VBN), (6,;,:), (7,for,IN), (8,example,NN), (9,,,,), (10,in,IN), (11,human,NN), (12,lung,NN), (13,tumor,NN), (14,cells,NNS), (15,cPLA2,NN), (16,activation,NN), (17,by,IN), (18,oncogenic,JJ), (19,Ras,NN), (20,has,VBZ), (21,been,VBN), (22,reported,VBN), (23,[,-LRB-), (24,88,CD), (25,],-RRB-), (26,.,.)"
     val words = tokenization2words(text_tokenization)
     val p = 16
     val gold_fact = 3.0
@@ -63,37 +63,37 @@ class TestFactuality extends FlatSpec with Matchers {
     val text_tokenization = "(0,In,IN), (1,most,JJS), (2,cases,NNS), (3,cPLA2,NN), (4,is,VBZ), (5,upregulated,VBN), (6,;,:), (7,for,IN), (8,example,NN), (9,,,,), (10,in,IN), (11,human,NN), (12,lung,NN), (13,tumor,NN), (14,cells,NNS), (15,cPLA2,NN), (16,activation,NN), (17,by,IN), (18,oncogenic,JJ), (19,Ras,NN), (20,has,VBZ), (21,been,VBN), (22,reported,VBN), (23,[,-LRB-), (24,88,CD), (25,],-RRB-), (26,.,.)"
     val words = tokenization2words(text_tokenization)
     val p = 16
-    val gold_fact = 3 * 3.0 / 4.0
+    val gold_fact = 2.25
     val pred_fact = rnn.predict(words, p)
  
     (pred_fact - gold_fact) should be (0.0 +- 0.5)
   }
 
-  it should "be about 2.25 as probably happened if the predicate is modified by modal verbs" in {
-    val text_tokenization = "(0,Elevated,JJ), (1,LIP,NN), (2,expression,NN), (3,can,MD), (4,,,,), (5,however,RB), (6,,,,), (7,induce,VBP), (8,proliferation,NN), (9,and,CC), (10,hyperplasias,NN), (11,that,WDT), (12,may,MD), (13,be,VB), (14,more,RBR), (15,susceptible,JJ), (16,to,TO), (17,additional,JJ), (18,oncogenic,JJ), (19,hits,NNS), (20,.,.)"
+  it should "be about 0.75 as possiblely happened if the predicate is used in a hypothesis" in {
+    val text_tokenization = "(0,To,TO), (1,identify,VB), (2,whether,IN), (3,the,DT), (4,downregulation,NN), (5,of,IN), (6,KRAS,NNP), (7,alone,RB), (8,inhibits,VBZ), (9,the,DT), (10,proliferation,NN), (11,of,IN), (12,the,DT), (13,TE-1,NN), (14,cell,NN), (15,line,NN), (16,,,,), (17,a,DT), (18,small,JJ), (19,interfering,VBG), (20,(,-LRB-), (21,si,FW), (22,),-RRB-), (23,K-ras,FW), (24,expression,NN), (25,vector,NN), (26,was,VBD), (27,constructed,VBN), (28,.,.)"
     val words = tokenization2words(text_tokenization)
-    val p = 7
-    val gold_fact = 3 * 3.0 / 4.0
+    val p = 8
+    val gold_fact = 0.75
     val pred_fact = rnn.predict(words, p)
  
     (pred_fact - gold_fact) should be (0.0 +- 0.5)
   }
 
   // UDS-IH2 dataset
-  it should "be about -2.25 as probably not happened if the predicate is under assumption" in {
-    val words = Array("What", "if", "Google", "Morphed", "Into", "GoogleOS", "?")
-    val p = 3
-    val gold_fact = -2.25
+  it should "be about -1.875 as possible not happened if the predicate is in doubt" in {
+    val words = Array("do", "n't", "they", "know", "we", "have", "better", "things", "to", "do")
+    val p = 9
+    val gold_fact = -1.875
     val pred_fact = rnn.predict(words, p)
  
     (pred_fact - gold_fact) should be (0.0 +- 0.5)
   }
 
 
-  it should "be about 1.5 as possible happened if the predicate is in doubt" in {
-    val words = Array("Does", "anybody", "use", "it", "for", "anything", "else", "?")
-    val p = 2
-    val gold_fact = 1.5
+  it should "be about -2.25 as probably not happened if the predicate is under assumption" in {
+    val words = Array("What", "if", "Google", "expanded", "on", "its", "search", "-", "engine", "(", "and", "now", "e-mail", ")", "wares", "into", "a", "full", "-", "fledged", "operating", "system", "?")
+    val p = 3
+    val gold_fact = -2.25
     val pred_fact = rnn.predict(words, p)
  
     (pred_fact - gold_fact) should be (0.0 +- 0.5)

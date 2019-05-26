@@ -33,7 +33,7 @@ object FactualityPrediction {
 
 		if(props.containsKey("test") && props.containsKey("model")) {
 		  logger.debug("Starting evaluation procedure...")
-		  // val testSentences = ColumnReader.readColumns(props.getProperty("test"))
+
 		  val rawtestSentences = ColumnReader.readColumns(props.getProperty("test"))
 		  val testSentences = Factuality.sentences2Instances(rawtestSentences)
 
