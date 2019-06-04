@@ -109,7 +109,7 @@ class TestFactuality extends FlatSpec with Matchers {
     (pred_fact - gold_fact) should be (0.0 +- 0.5)
   }
 
-  it should "be about 3 as definitedly happened if the predicate is past tense" in {
+  it should "be about 3 as definitely happened if the predicate is past tense" in {
     val words = Array("On", "the", "next", "two", "pictures", "he", "took", "screenshots", "of", "two", "beheading", "video's", ".")
     val p = 6
     val gold_fact = 3.0
