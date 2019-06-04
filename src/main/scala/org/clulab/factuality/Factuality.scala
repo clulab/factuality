@@ -7,7 +7,6 @@ import java.io.OutputStreamWriter
 import java.io.{FileWriter, PrintWriter}
 
 import org.clulab.embeddings.word2vec.Word2Vec
-import org.clulab.struct.Counter
 import org.slf4j.{Logger, LoggerFactory}
 import scala.collection.mutable.{ArrayBuffer, ListBuffer}
 import edu.cmu.dynet._
@@ -183,11 +182,12 @@ class Factuality {
     regression
   }
 
-  // /**
-  //   * Predict the sequence tags that applies to the given sequence of words
-  //   * @param words The input words
-  //   * @return The predicted sequence of tags
-  //   */
+  /**
+    * This is the API main entry point: it predicts the factuality score of the predicate at position p in the sentence
+    * @param words The words in the sentence
+    * @param p The position of the predicate
+    * @return The factuality score
+    */
   def predict(words: Array[String], p:Int):Float = {
     // Note: this block MUST be synchronized. Currently the computational graph in DyNet is a static variable.
     val emissionScore: Expression = synchronized {
@@ -621,28 +621,3 @@ object Factuality {
   }
 }
 
-/** Some really basic vector math that happens outside of DyNet */
-// not defirrentiable
-//object ArrayMath {
-//  def argmax(vector:Array[Float]):Int = {
-//    var bestValue = Float.MinValue
-//    var bestArg = 0
-//    for(i <- vector.indices) {
-//      if(vector(i) > bestValue) {
-//        bestValue = vector(i)
-//        bestArg = i
-//      }
-//    }
-//    bestArg
-//  }
-//
-//  def sum(v1:Array[Float], v2:Array[Float]): Array[Float] = {
-//    assert(v1.length == v2.length)
-//    val s = new Array[Float](v1.length)
-//    for(i <- v1.indices) {
-//      s(i) = v1(i) + v2(i)
-//    }
-//    s
-//  }
-//}
-//

@@ -1,8 +1,5 @@
 package org.clulab.sequences
 
-import org.clulab.processors.Sentence
-import org.clulab.sequences.ColumnsToDocument.in
-
 import scala.collection.mutable.ArrayBuffer
 import scala.io.Source
 
