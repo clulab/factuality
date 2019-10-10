@@ -24,7 +24,7 @@ object FactualityPrediction {
 		  val testSentences = Factuality.sentences2Instances(rawtestSentences)
 
 		  val rnn = Factuality(props.getProperty("model"))
-		  rnn.evaluate(testSentences)
+		  rnn.evaluate(testSentences, "model of " + props.getProperty("model") + " eval on " + props.getProperty("test"))
 
 		}
 	}

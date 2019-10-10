@@ -564,7 +564,7 @@ object Factuality {
 
       val rnn = new Factuality()
       rnn.initialize(trainSentences, embeddingsFile)
-      rnn.train(trainSentences, devSentences, props.getProperty("model"))
+      rnn.train(trainSentences, devSentences, "model of " + props.getProperty("model") + " development on " + props.getProperty("dev"))
 
       if(props.containsKey("model")) {
         val modelFilePrefix = props.getProperty("model")
@@ -579,7 +579,7 @@ object Factuality {
       val testSentences = sentences2Instances(rawtestSentences)
 
       val rnn = Factuality(props.getProperty("model"))
-      rnn.evaluate(testSentences, props.getProperty("model"))
+      rnn.evaluate(testSentences, "model of " + props.getProperty("model") + " eval on " + props.getProperty("test"))
 
     }
   }
