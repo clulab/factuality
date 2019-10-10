@@ -31,7 +31,7 @@ class Factuality {
     * @param trainSentences Training sentences
     * @param devSentences Development/validation sentences, used for logging purposes only
     */
-  def train(trainSentences: Array[Array[String]], devSentences:Array[Array[String]]): Unit = {
+  def train(trainSentences: Array[Array[String]], devSentences:Array[Array[String]], devPrefix: String): Unit = {
     //val trainer = new SimpleSGDTrainer(model.parameters, learningRate = 0.01f)
     val trainer = new RMSPropTrainer(model.parameters)
     var cummulativeLoss = 0.0
@@ -72,7 +72,7 @@ class Factuality {
 
       // check dev performance in this epoch
       if(devSentences.nonEmpty)
-        evaluate(devSentences, epoch)
+        evaluate(devSentences, devPrefix, epoch)
     }
   }
 
@@ -114,18 +114,18 @@ class Factuality {
     (mae, r)
   }
 
-  def evaluate(sentences:Array[Array[String]], epoch:Int): Unit = {
-    evaluate(sentences, "development", epoch)
+  def evaluate(sentences:Array[Array[String]], prefix:String, epoch:Int): Unit = {
+    evaluate(sentences, prefix, "development", epoch)
   }
 
-  def evaluate(sentences:Array[Array[String]]): Unit = {
-    evaluate(sentences, "testing", -1)
+  def evaluate(sentences:Array[Array[String]], prefix:String): Unit = {
+    evaluate(sentences, prefix, "testing", -1)
   }
 
   /** Logs mae and r on devSentences; also saves the output in the file dev.output.<EPOCH> */
-  def evaluate(sentences:Array[Array[String]], name:String, epoch:Int): Unit = {
+  def evaluate(sentences:Array[Array[String]], prefix:String, name:String, epoch:Int): Unit = {
 
-    val pw = new PrintWriter(new FileWriter("dev.output." + epoch))
+    val pw = new PrintWriter(new FileWriter(prefix+"dev.output." + epoch))
     logger.debug(s"Started evaluation on the $name dataset...")
 
     val preds = new ArrayBuffer[Float]()
@@ -564,7 +564,7 @@ object Factuality {
 
       val rnn = new Factuality()
       rnn.initialize(trainSentences, embeddingsFile)
-      rnn.train(trainSentences, devSentences)
+      rnn.train(trainSentences, devSentences, props.getProperty("model"))
 
       if(props.containsKey("model")) {
         val modelFilePrefix = props.getProperty("model")
@@ -579,7 +579,7 @@ object Factuality {
       val testSentences = sentences2Instances(rawtestSentences)
 
       val rnn = Factuality(props.getProperty("model"))
-      rnn.evaluate(testSentences)
+      rnn.evaluate(testSentences, props.getProperty("model"))
 
     }
   }
