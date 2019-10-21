@@ -1,6 +1,6 @@
 *.class
 *.output*
-*.log
+*log
 .idea
 .idea/*
 *.iml

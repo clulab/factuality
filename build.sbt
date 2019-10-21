@@ -17,3 +17,8 @@ libraryDependencies ++= Seq(
   "org.scalatest" %% "scalatest" % "3.0.1" % "test"
   // "org.clulab" %% "factuality-models" % "0.1.0" // this does not exist yet
 )
+
+assemblyMergeStrategy in assembly := {
+	case PathList("META-INF", "MANIFEST.MF") => MergeStrategy.discard
+	case _ => MergeStrategy.first
+}
