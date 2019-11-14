@@ -10,8 +10,11 @@ that should be released.
 1. Update the `README.md` file in that directory to document the model files.
 1. Increment the version number in `version.sbt`.
 1. Update `CHANGES.md` to record what has changed about the models.
+1. Create a local version using `sbt publishLocal`
+1. Update the dependency for the `factuality-client` project to the new version
+ and make sure the client runs.  This may require "touching" `../build.sbt`.
 1. Assuming that you are set up to do so, run `sbt release`.
-1. Upon success, update the dependency for the `factuality-client` project
-to the new version and make sure the client runs.
-1. Remove the models from their directory and restore the placeholders.
+1. Remove the local version from the ivy2 directory.
+1. Make sure the client version runs with the remove version.
+1. Delete the models, which are too large for github, from their directory and restore the placeholders.
 1. Push the changes in `factuality-models` and `factuality-client` to github.

@@ -59,7 +59,7 @@ object Client {
       val (w2i, c2i, dim) = Timer.time("Read x2i") { loadX2i(modelFilename) }
       val model = mkParams(w2i, c2i, dim)
 
-      loadRnn(modelFilename, model.parameters)
+      Timer.time("Read rnn") { loadRnn(modelFilename, model.parameters) }
       model
     }
   }
@@ -91,7 +91,7 @@ object Client {
     }
 
     protected def loadRnn(modelFilename: String, model: ParameterCollection, key: String = ""): Unit = {
-      val dynetFilename = base + mkDynetFilename(modelFilename)
+      val dynetFilename = mkDynetFilename(modelFilename)
       val url = myClassLoader.getResource(dynetFilename)
       if (Option(url).isEmpty)
         throw new RuntimeException(s"ERROR: cannot locate the model file $dynetFilename!")
@@ -130,8 +130,8 @@ object Client {
 
     // now load the saved model
     val rnn = new Factuality()
-    val loader = new FileLoader("../data/", modelFilename)
-//    val loader = new ResourceLoader("org/clulab/factuality/models/", modelFilename)
+//    val loader = new FileLoader("./data/", modelFilename)
+    val loader = new ResourceLoader("org/clulab/factuality/models/", modelFilename)
 
     rnn.model = Timer.time("Loading models") { loader.load(modelFilename) }
     rnn
