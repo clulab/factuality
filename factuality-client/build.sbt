@@ -9,7 +9,7 @@ scalaVersion := "2.12.6"
 scalacOptions ++= Seq("-feature", "-unchecked", "-deprecation")
 
 libraryDependencies ++= Seq(
-  // This must depend on "fatdynet" % "0.2.3" or higher for zip functionality.
-  "org.clulab" %% "factuality" % "1.0-SNAPSHOT" //,
-//  "org.clulab" %  "factuality-models" % "0.1.0-SNAPSHOT"
+  // The models are not needed for compilation.  Uncomment this line and update
+  // the version number in order to run the client with jarred models from maven.
+  "org.clulab" %  "factuality-models" % "0.1.0-SNAPSHOT"
 )
