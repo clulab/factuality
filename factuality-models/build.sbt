@@ -4,23 +4,23 @@ name := "factuality-models"
 
 organization := "org.clulab"
 
-scalaVersion := "2.11.8"
+scalaVersion := "2.12.6"
 
 
 // these are the steps to be performed during release
 releaseProcess := Seq[ReleaseStep](
   checkSnapshotDependencies,
-  inquireVersions,
+//  inquireVersions,
   runClean,
   runTest,
-  setReleaseVersion,
-  commitReleaseVersion,
-  tagRelease,
+//  setReleaseVersion,
+//  commitReleaseVersion,
+//  tagRelease,
   ReleaseStep(action = Command.process("publishSigned", _)),
-  setNextVersion,
-  commitNextVersion,
-  ReleaseStep(action = Command.process("sonatypeReleaseAll", _)),
-  pushChanges
+//  setNextVersion,
+//  commitNextVersion,
+  ReleaseStep(action = Command.process("sonatypeReleaseAll", _)) //,
+//  pushChanges
 )
 
 
