@@ -155,9 +155,9 @@ object Client {
 
     // now load the saved model
     val rnn = new Factuality()
-    val loader = new FileLoader("./data/", modelFilename) // file, uncompressed
+//    val loader = new FileLoader("./data/", modelFilename) // file, uncompressed
 //    val loader = new ZipFileLoader("org/clulab/factuality/models/", modelFilename, "~/.ivy2/local/org.clulab/factuality-models/0.2.0/jars/factuality-models.jar") // file, compressed, replace ~ as appropriate
-//    val loader = new ResourceLoader("org/clulab/factuality/models/", modelFilename) // resource in jar or zip file
+    val loader = new ResourceLoader("org/clulab/factuality/models/", modelFilename) // resource in jar or zip file
 
     rnn.model = Timer.time("Loading models") { loader.load(modelFilename) }
     rnn

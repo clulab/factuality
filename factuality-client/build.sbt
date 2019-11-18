@@ -11,5 +11,5 @@ scalacOptions ++= Seq("-feature", "-unchecked", "-deprecation")
 libraryDependencies ++= Seq(
   // The models are not needed for compilation.  Uncomment this line and update
   // the version number in order to run the client with jarred models from maven.
-  "org.clulab" %  "factuality-models" % "0.1.0-SNAPSHOT"
+  //"org.clulab" % "factuality-models" % "0.2.0"
 )
