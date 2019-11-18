@@ -4,6 +4,7 @@ import java.io.File
 import java.net.JarURLConnection
 import java.net.URI
 import java.nio.charset.StandardCharsets
+import java.util.zip.ZipFile
 
 import edu.cmu.dynet.Initialize
 import edu.cmu.dynet.ParameterCollection
@@ -72,9 +73,33 @@ object Client {
 
     protected def loadRnn(modelFilename: String, model: ParameterCollection, key: String = ""): Unit = {
       val dynetFilename = mkDynetFilename(modelFilename)
+      val nativeDynetFileName = new File(dynetFilename).getCanonicalPath
 
-      new CloseableModelLoader(dynetFilename).autoClose { modelLoader =>
+      new CloseableModelLoader(nativeDynetFileName).autoClose { modelLoader =>
         modelLoader.populateModel(model, key)
+      }
+    }
+  }
+
+  class ZipFileLoader(base: String, modelFilename: String, zipFilename: String) extends Loader(base) {
+    println(s"Wanting to load ${mkDynetFilename(modelFilename)} from zip file $zipFilename")
+    println(s"Wanting to load ${mkX2iFilename(modelFilename)} from zip file $zipFilename")
+
+    def getSource(filename: String): Source = {
+      val x2iFilename = mkX2iFilename(modelFilename)
+      val zipFile = new ZipFile(zipFilename)
+      val zipEntry = zipFile.getEntry(x2iFilename)
+      val inputStream = zipFile.getInputStream(zipEntry)
+
+      Source.fromInputStream(inputStream, utf8)
+    }
+
+    protected def loadRnn(modelFilename: String, model: ParameterCollection, key: String = ""): Unit = {
+      val dynetFilename = mkDynetFilename(modelFilename)
+      val nativeZipFileName = new File(zipFilename).getCanonicalPath
+
+      new CloseableZipModelLoader(dynetFilename, nativeZipFileName).autoClose { zipModelLoader =>
+        zipModelLoader.populateModel(model, key)
       }
     }
   }
@@ -130,8 +155,9 @@ object Client {
 
     // now load the saved model
     val rnn = new Factuality()
-//    val loader = new FileLoader("./data/", modelFilename)
-    val loader = new ResourceLoader("org/clulab/factuality/models/", modelFilename)
+    val loader = new FileLoader("./data/", modelFilename) // file, uncompressed
+//    val loader = new ZipFileLoader("org/clulab/factuality/models/", modelFilename, "~/.ivy2/local/org.clulab/factuality-models/0.2.0/jars/factuality-models.jar") // file, compressed, replace ~ as appropriate
+//    val loader = new ResourceLoader("org/clulab/factuality/models/", modelFilename) // resource in jar or zip file
 
     rnn.model = Timer.time("Loading models") { loader.load(modelFilename) }
     rnn
