@@ -1,3 +1,5 @@
+lazy val something = 5
+
 name := "factuality"
 
 version := "1.0-SNAPSHOT"
@@ -13,7 +15,7 @@ libraryDependencies ++= Seq(
   "org.clulab" %% "processors-corenlp" % "7.5.1",
   "org.clulab" %% "processors-modelscorenlp" % "7.5.1",
   "org.clulab" %% "processors-modelsmain" % "7.5.1",
-  "org.clulab" %% "fatdynet" % "0.2.3", // Zip functionality is required for factuality-client.
+  "org.clulab" %% "fatdynet" % "0.2.4", // Zip functionality of 0.2.3 or higher is required for factuality-client.
   "org.scalatest" %% "scalatest" % "3.0.1" % "test"
 )
 
