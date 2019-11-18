@@ -8,7 +8,7 @@ out so that error messages are not generated.  I looks something like
   
 The most recently produced models are located on the clulab servers at
 
-`/net/kate/storage/work/kalcock/models/org.clulab/factuality-models`
+`/net/kate/storage/data/nlp/models/org.clulab/factuality-models`
 
 These files need to be copied to the appropriate place in your local ivy2 directory,
 which is probably `~/.ivy2/local/org.clulab/factuality-models`.  Once this has been done,

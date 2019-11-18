@@ -31,7 +31,8 @@ that should be released.
    and make sure the client runs.  This may require "touching" `../build.sbt`.
 1. Do not both with `sbt release`, because the files are too large for Maven Central.
 1. Manually copy the locally published model files from your `ivy2` directory, usually
-   `~/.ivy2/local/org.clulab/factuality-models` to, for example, the CluLab google drive.
+   `~/.ivy2/local/org.clulab/factuality-models` to, for example, clulab servers at
+   `/data/nlp/models/org.clulab/factuality-models`.
 1. If necessary, update the `README.md` file for the `factuality-client` project so that
    people know where to find the files.   
 1. Leave the local version in the ivy2 directory for your own use.
