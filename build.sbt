@@ -1,5 +1,3 @@
-lazy val something = 5
-
 name := "factuality"
 
 version := "1.0-SNAPSHOT"
