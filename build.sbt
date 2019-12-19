@@ -13,7 +13,7 @@ libraryDependencies ++= Seq(
   "org.clulab" %% "processors-corenlp" % "7.5.1",
   "org.clulab" %% "processors-modelscorenlp" % "7.5.1",
   "org.clulab" %% "processors-modelsmain" % "7.5.1",
-  "org.clulab" %% "fatdynet" % "0.2.0",
+  "org.clulab" %% "fatdynet" % "0.2.4", // Zip functionality of 0.2.3 or higher is required for factuality-client.
   "org.scalatest" %% "scalatest" % "3.0.1" % "test"
 )
 
@@ -21,3 +21,10 @@ assemblyMergeStrategy in assembly := {
 	case PathList("META-INF", "MANIFEST.MF") => MergeStrategy.discard
 	case _ => MergeStrategy.first
 }
+
+lazy val core = (project in file("."))
+
+lazy val `factuality-client` = project
+  .dependsOn(core)
+  
+lazy val `factuality-models` = project
