@@ -13,18 +13,11 @@ This repository contains:
 
 # Installation
 
-This software requires Java 1.8, Scala 2.12, and CoreNLP 3.x or higher.
-
-The SBT dependencies are captured in the build file. They are:
+To use the existing factuality client and the pretrained model, add the following dependency to your `build.sbt` file:
 
 ```scala
 libraryDependencies ++= Seq(
-  "org.clulab" %% "processors-main" % "7.5.1",
-  "org.clulab" %% "processors-corenlp" % "7.5.1",
-  "org.clulab" %% "processors-modelscorenlp" % "7.5.1",
-  "org.clulab" %% "processors-modelsmain" % "7.5.1",
-  "org.clulab" %% "fatdynet" % "0.2.4", 
-  "org.scalatest" %% "scalatest" % "3.0.1" % "test"
+  "org.clulab" %% "factuality" % "1.0-SNAPSHOT",
 )
 ```
 
