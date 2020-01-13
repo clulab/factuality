@@ -31,7 +31,7 @@ If you simply want to include the factuality library in your code, add the above
 ```
 val rnn = Factuality("fact")
 val words = Array("Parthenolide", "induced", "apoptosis", "and", "inhibited", "cell", "proliferation", "and", "the", "expression", "of", "VEGF", "in", "vitro", ".")
-val p = 1   # predicate's index position
+val p = 1   // predicate's index position
 val pred_fact = rnn.predict(words, p)                     
 ```
 
