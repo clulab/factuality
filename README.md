@@ -18,7 +18,7 @@ To use the existing factuality client and the pretrained model, add the followin
 ```scala
 libraryDependencies ++= Seq(
   "org.clulab" %% "factuality" % "1.0-SNAPSHOT",
-  "org.clulab" %% "factuality-models" % "1.0-SNAPSHOT",
+  "org.clulab" % "factuality-models" % "1.0-SNAPSHOT",
 )
 ```
 
