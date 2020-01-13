@@ -29,7 +29,7 @@ that should be released.
 1. Create a local version using `sbt publishLocal`
 1. Update the dependency for the `factuality-client` project to the new version
    and make sure the client runs.  This may require "touching" `../build.sbt`.
-1. Do not both with `sbt release`, because the files are too large for Maven Central.
+1. Do not bother with `sbt release`, because the files are too large for Maven Central.
 1. Manually copy the locally published model files from your `ivy2` directory, usually
    `~/.ivy2/local/org.clulab/factuality-models` to, for example, clulab servers at
    `/data/nlp/models/org.clulab/factuality-models`.
