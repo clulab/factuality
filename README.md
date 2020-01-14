@@ -11,7 +11,7 @@ This repository contains:
 + Scala source code `Factuality.scala` for training the neural model (which is mostly a standard 2-layer bidirectional linear chain LSTM, followed by a 2-layer regression model), and `FactualityPrediction.scala` for evaluation.
 
 
-# Installation
+# Installation for regular users
 
 To use the existing factuality client and the pretrained model, add the following dependency to your `build.sbt` file:
 
