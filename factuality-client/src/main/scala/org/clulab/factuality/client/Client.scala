@@ -177,8 +177,13 @@ object Client {
       val rawtestSentences = ColumnReader.readColumns(props.getProperty("test"))
       val testSentences = Factuality.sentences2Instances(rawtestSentences)
 
-      val rnn = load(props.getProperty("model"))
-      rnn.evaluate(testSentences, "model." + props.getProperty("model") + ".eval." + props.getProperty("test").split('/').last+".")
+      val modelFilePrefix = props.getProperty("model")
+      val rnn = Factuality(modelFilePrefix)
+
+      val testFileStr = props.getProperty("test").split('/').last
+      val testOutputPrefix = "model_" + modelFilePrefix + ".test_" + testFileStr + ".epoch_"
+        
+      rnn.evaluate(testSentences, testOutputPrefix)
     }
   }
 }
