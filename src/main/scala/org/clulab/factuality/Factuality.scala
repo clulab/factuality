@@ -125,7 +125,7 @@ class Factuality {
   /** Logs mae and r on devSentences; also saves the output in the file dev.output.<EPOCH> */
   def evaluate(sentences:Array[Array[String]], prefix:String, name:String, epoch:Int): Unit = {
 
-    val pw = new PrintWriter(new FileWriter(prefix+"dev.output." + epoch))
+    val pw = new PrintWriter(new FileWriter(prefix + epoch))
     logger.debug(s"Started evaluation on the $name dataset...")
 
     val preds = new ArrayBuffer[Float]()
@@ -542,44 +542,42 @@ object Factuality {
       System.exit(1)
     }
 
-    if(props.containsKey("train") && props.containsKey("embed")) {
+    if(props.containsKey("train") && props.containsKey("dev") && props.containsKey("embed")) {
       logger.debug("Starting training procedure...")
-      // val rawtrainSentences = ColumnReader.readColumns(props.getProperty("train"))
+ 
       var rawtrainSentences = ColumnReader.readColumns(props.getProperty("train"))
-      
       // one sentence can conatin more than one predicates that annotated with factuality
       // convert to format Array[String]: position_predicate, factuality, sentence words
       val trainSentences = sentences2Instances(rawtrainSentences)
 
 
       var rawdevSentences = ColumnReader.readColumns(props.getProperty("dev"))
-//        if(props.containsKey("dev"))
-//          Some(ColumnReader.readColumns(props.getProperty("dev")))
-//        else
-//          None
-
       val devSentences = sentences2Instances(rawdevSentences)
 
       val embeddingsFile = props.getProperty("embed")
 
       val rnn = new Factuality()
-      rnn.initialize(trainSentences, embeddingsFile)
-      rnn.train(trainSentences, devSentences, "model." + props.getProperty("model") + ".dev." + props.getProperty("dev").split('/').last+".")
 
       if(props.containsKey("model")) {
         val modelFilePrefix = props.getProperty("model")
+        val devFileStr = props.getProperty("dev").split('/').last
+        val devOutputPrefix = "model_" + modelFilePrefix + ".dev_" + devFileStr + ".epoch_"
+        rnn.initialize(trainSentences, embeddingsFile)
+        rnn.train(trainSentences, devSentences, devOutputPrefix)
         save(modelFilePrefix, rnn.model)
       }
     }
 
-    if(props.containsKey("test") && props.containsKey("model")) {
+    if(props.containsKey("model") && props.containsKey("test")) {
       logger.debug("Starting evaluation procedure...")
-      // val testSentences = ColumnReader.readColumns(props.getProperty("test"))
+      val modelFilePrefix = props.getProperty("model")
+      val testFileStr = props.getProperty("test").split('/').last
+      val testOutputPrefix = "model_" + modelFilePrefix + ".test_" + testFileStr + ".epoch_"
       val rawtestSentences = ColumnReader.readColumns(props.getProperty("test"))
       val testSentences = sentences2Instances(rawtestSentences)
 
-      val rnn = Factuality(props.getProperty("model"))
-      rnn.evaluate(testSentences, "model." + props.getProperty("model") + ".eval." + props.getProperty("test").split('/').last+".")
+      val rnn = Factuality(modelFilePrefix)
+      rnn.evaluate(testSentences, testOutputPrefix)
 
     }
   }

@@ -17,14 +17,20 @@ object FactualityPrediction {
 		  System.exit(1)
 		}
 
+
 		if(props.containsKey("test") && props.containsKey("model")) {
 		  logger.debug("Starting evaluation procedure...")
 
 		  val rawtestSentences = ColumnReader.readColumns(props.getProperty("test"))
 		  val testSentences = Factuality.sentences2Instances(rawtestSentences)
 
-		  val rnn = Factuality(props.getProperty("model"))
-		  rnn.evaluate(testSentences, "model." + props.getProperty("model") + ".eval." + props.getProperty("test").split('\')(-2)+".")
+		  val modelFilePrefix = props.getProperty("model")
+		  val rnn = Factuality(modelFilePrefix)
+
+	      val testFileStr = props.getProperty("test").split('/').last
+	      val testOutputPrefix = "model_" + modelFilePrefix + ".test_" + testFileStr + ".epoch_"
+	      
+		  rnn.evaluate(testSentences, testOutputPrefix)
 		}
 	}
 }
