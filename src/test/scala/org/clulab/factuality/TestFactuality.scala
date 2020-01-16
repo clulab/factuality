@@ -1,32 +1,12 @@
 package org.clulab.factuality
 import org.scalatest.{FlatSpec, Matchers}
-import java.io.BufferedOutputStream
-import java.io.FileOutputStream
-import java.io.OutputStreamWriter
-import java.io.{FileWriter, PrintWriter}
 
-import org.clulab.embeddings.word2vec.Word2Vec
-import org.clulab.struct.Counter
-import org.slf4j.{Logger, LoggerFactory}
-import scala.collection.mutable.{ArrayBuffer, ListBuffer}
-import edu.cmu.dynet._
-import edu.cmu.dynet.Expression._
-import Factuality._
-import org.clulab.fatdynet.utils.CloseableModelSaver
-import org.clulab.fatdynet.utils.Closer.AutoCloser
-import org.clulab.struct.MutableNumber
-import org.clulab.utils.{MathUtils, Serializer, StringUtils}
+import scala.collection.mutable.ArrayBuffer
 
-import org.clulab.sequences._
-import scala.collection.mutable
-import scala.io.Source
-import scala.util.Random
-
- 
 class TestFactuality extends FlatSpec with Matchers {
   // val proc:Processor = new BioCluProcessor
   // val s1 = "Cells were additionally stimulated with 10 ng/ml NRG and cell extracts analyzed for ErbB3 tyrosine phosphorylation"
-  val rnn = Factuality("fact")
+  val rnn: Factuality = Factuality("fact", fromResource = false)
   // rnn.evaluate(testSentences)
 
   // sci dataset

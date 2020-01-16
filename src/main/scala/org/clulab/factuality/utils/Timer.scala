@@ -1,4 +1,4 @@
-package org.clulab.factuality.client.utils
+package org.clulab.factuality.utils
 
 class Timer(val description: String) {
   var elapsedTime: Option[Long] = None

@@ -1,27 +1,28 @@
-
 package org.clulab.factuality
 
 import java.io.BufferedOutputStream
+import java.io.File
 import java.io.FileOutputStream
 import java.io.OutputStreamWriter
 import java.io.{FileWriter, PrintWriter}
+import java.net.JarURLConnection
+import java.net.URI
 
-import org.clulab.embeddings.word2vec.Word2Vec
 import org.slf4j.{Logger, LoggerFactory}
+
 import scala.collection.mutable.{ArrayBuffer, ListBuffer}
 import edu.cmu.dynet._
 import edu.cmu.dynet.Expression._
 import Factuality._
+import org.clulab.factuality.utils.MathUtils
+import org.clulab.factuality.utils.Serializer
 import org.clulab.fatdynet.utils.CloseableModelSaver
 import org.clulab.fatdynet.utils.Closer.AutoCloser
-import org.clulab.struct.MutableNumber
-import org.clulab.utils.{MathUtils, Serializer, StringUtils}
-
 import org.clulab.sequences._
+
 import scala.collection.mutable
 import scala.io.Source
 import scala.util.Random
-
 
 class Factuality {
   var model:LstmParameters = _
@@ -87,7 +88,7 @@ class Factuality {
     var mae = 0.0
     var true_sum = 0.0
     var pred_sum = 0.0
-    var n = golds.length
+    val n = golds.length
 
     for(i <- golds.indices) {
         mae = mae + math.abs(preds(i) - golds(i))
@@ -96,8 +97,8 @@ class Factuality {
     }
 
     mae = mae / n
-    var true_mean = true_sum / n
-    var pred_mean = pred_sum / n
+    val true_mean = true_sum / n
+    val pred_mean = pred_sum / n
 
 
     var sum_prod = 0.0
@@ -109,7 +110,7 @@ class Factuality {
       pred_square_sum = pred_square_sum + (preds(i) - pred_mean) * (preds(i) - pred_mean)
     }
 
-    var r = sum_prod / math.sqrt(true_square_sum) / math.sqrt(pred_square_sum) 
+    val r = sum_prod / math.sqrt(true_square_sum) / math.sqrt(pred_square_sum)
 
     (mae, r)
   }
@@ -142,7 +143,7 @@ class Factuality {
     }
 
     val golds = sentences.map(_(0).toFloat)
-    var (mae, r) = mae_r(golds, preds.toArray)
+    val (mae, r) = mae_r(golds, preds.toArray)
 
     pw.close()
     logger.info(s"Mean absolute error (MAE) on $name sentences: " + mae)
@@ -169,7 +170,7 @@ class Factuality {
     val v2 = parameter(model.v2)
     val b2 = parameter(model.b2)
 
-    var regression = Expression.dotProduct(v2, Expression.rectify(v1 * states(p) + b1)) + b2
+    val regression = Expression.dotProduct(v2, Expression.rectify(v1 * states(p) + b1)) + b2
 
 
       // if(doDropout) {
@@ -249,11 +250,7 @@ class Factuality {
     states
   }
 
-  def initialize(trainSentences:Array[Array[String]], embeddingsFile:String): Unit = {
-    logger.debug(s"Loading embeddings from file $embeddingsFile...")
-    val w2v = new Word2Vec(embeddingsFile)
-    logger.debug(s"Completed loading embeddings for a vocabulary of size ${w2v.matrix.size}.")
-
+  def initialize(trainSentences:Array[Array[String]], w2v: Embedder): Unit = {
     val (w2i, c2i) = mkVocabs(trainSentences, w2v)
     // logger.debug(s"Tag vocabulary has ${t2i.size} entries.")
     logger.debug(s"Word vocabulary has ${w2i.size} entries (including 1 for unknown).")
@@ -301,21 +298,20 @@ class LstmParameters(
   }
 
 
-  def initializeEmbeddings(w2v:Word2Vec): Unit = {
+  def initializeEmbeddings(w2v:Embedder): Unit = {
     logger.debug("Initializing DyNet embedding parameters...")
-    for(word <- w2v.matrix.keySet){
-      lookupParameters.initialize(w2i(word), new FloatVector(toFloatArray(w2v.matrix(word))))
+    for(word <- w2v.words){
+      lookupParameters.initialize(w2i(word), new FloatVector(toFloatArray(w2v(word))))
     }
-    logger.debug(s"Completed initializing embedding parameters for a vocabulary of size ${w2v.matrix.size}.")
+    logger.debug(s"Completed initializing embedding parameters for a vocabulary of size ${w2v.size}.")
   }
-
 }
 
 object Factuality {
   val logger:Logger = LoggerFactory.getLogger(classOf[Factuality])
 
   val EPOCHS = 1
-  val RANDOM_SEED = 2522620396l // used for both DyNet, and the JVM seed for shuffling data
+  val RANDOM_SEED = 2522620396L // used for both DyNet, and the JVM seed for shuffling data
   val DROPOUT_PROB = 0.1f
   val DO_DROPOUT = true
 
@@ -331,6 +327,20 @@ object Factuality {
   val LOG_MIN_VALUE:Float = -10000
 
   val USE_DOMAIN_CONSTRAINTS = true
+
+  def apply(modelFilename:String, fromResource: Boolean = true): Factuality = {
+    // make sure DyNet is initialized!
+    Initialize.initialize(Map("random-seed" -> RANDOM_SEED))
+
+    // now load the saved model
+    val rnn = new Factuality()
+    rnn.model =
+        if (fromResource)
+          loadFromResource(modelFilename)
+        else
+          loadFromFile(modelFilename)
+    rnn
+  }
 
   protected def save[T](printWriter: PrintWriter, values: Map[T, Int], comment: String): Unit = {
     printWriter.println("# " + comment)
@@ -368,92 +378,70 @@ object Factuality {
     }
   }
 
-  abstract class ByLineBuilder[IntermediateValueType] {
+  protected def loadX2I(source: Source): (Map[String, Int], Map[Char, Int], Int) = {
+    def stringToString(string: String): String = string
+    def stringToChar(string: String): Char = string.charAt(0)
 
-    protected def addLines(intermediateValue: IntermediateValueType, lines: Iterator[String]): Unit = {
-      lines.next() // Skip the comment line
+    val byLineStringMapBuilder = new ByLineMapBuilder(stringToString)
+    val byLineCharMapBuilder = new ByLineMapBuilder(stringToChar)
 
-      def nextLine(): Boolean = {
-        val line = lines.next()
+    val lines = source.getLines()
+    val w2i = byLineStringMapBuilder.build(lines)
+    // val t2i = byLineStringMapBuilder.build(lines)
+    val c2i = byLineCharMapBuilder.build(lines)
+    // val i2t = new ByLineArrayBuilder().build(lines)
+    val dim = new ByLineIntBuilder().build(lines)
 
-        if (line.nonEmpty) {
-          addLine(intermediateValue, line)
-          true // Continue on non-blank lines.
-        }
-        else
-          false // Stop at first blank line.
+    (w2i, c2i, dim)
+  }
+
+  protected def loadFromResource(modelFilename: String): LstmParameters = {
+    val dynetFilename = modelFilename + ".rnn"
+    val x2iFilename = modelFilename + ".x2i"
+    // This code will soon appear in fatdynet
+    val zipname = {
+      val classLoader = this.getClass.getClassLoader
+      val resourceName = dynetFilename
+
+      val url = classLoader.getResource(resourceName)
+      if (Option(url).isEmpty)
+        throw new RuntimeException(s"ERROR: cannot locate the model file $resourceName!")
+      val protocol = url.getProtocol
+      if (protocol == "jar") {
+        // The resource has been jarred, and must be extracted with a ZipModelLoader.
+        val jarUrl = url.openConnection().asInstanceOf[JarURLConnection].getJarFileURL
+        val protocol2 = jarUrl.getProtocol
+        assert(protocol2 == "file")
+        val uri = new URI(jarUrl.toString)
+        // This converts both percent encoded characters and file separators.
+        val nativeJarFileName = new File(uri).getCanonicalPath
+        val resourceFileName = uri.getPath
+
+        resourceFileName
       }
-
-      while (nextLine()) { }
+      else
+        throw new RuntimeException(s"ERROR: cannot process the model file $resourceName!")
     }
 
-    def addLine(intermediateValue: IntermediateValueType, line: String): Unit
+    val (w2i, c2i, dim) = Serializer.using(Source.fromResource(x2iFilename, this.getClass.getClassLoader)("UTF-8")) { source =>
+      loadX2I(source)
+    }
+
+    val oldModel = {
+      val model = mkParams(w2i, c2i, dim)
+
+      new ZipModelLoader(dynetFilename, zipname).populateModel(model.parameters, "/all")
+      model
+    }
+
+    oldModel
   }
 
-  // This is a little fancy because it works with both String and Char keys.
-  class ByLineMapBuilder[KeyType](val converter: String => KeyType) extends ByLineBuilder[mutable.Map[KeyType, Int]] {
-    def addLine(mutableMap: mutable.Map[KeyType, Int], line: String): Unit = {
-      val Array(key, value) = line.split('\t')
-
-      mutableMap += ((converter(key), value.toInt))
-    }
-
-    def build(lines: Iterator[String]): Map[KeyType, Int] = {
-      val mutableMap: mutable.Map[KeyType, Int] = new mutable.HashMap
-
-      addLines(mutableMap, lines)
-      mutableMap.toMap
-    }
-  }
-
-  // This only works with Strings.
-  class ByLineArrayBuilder extends ByLineBuilder[ArrayBuffer[String]] {
-
-    def addLine(arrayBuffer: ArrayBuffer[String], line: String): Unit = {
-      arrayBuffer += line
-    }
-
-    def build(lines: Iterator[String]): Array[String] = {
-      val arrayBuffer: ArrayBuffer[String] = ArrayBuffer.empty
-
-      addLines(arrayBuffer, lines)
-      arrayBuffer.toArray
-    }
-  }
-
-  // This only works with Strings.
-  class ByLineIntBuilder extends ByLineBuilder[MutableNumber[Option[Int]]] {
-
-    def addLine(mutableNumberOpt: MutableNumber[Option[Int]], line: String): Unit = {
-      mutableNumberOpt.value = Some(line.toInt)
-    }
-
-    def build(lines: Iterator[String]): Int = {
-      var mutableNumberOpt: MutableNumber[Option[Int]] = new MutableNumber(None)
-
-      addLines(mutableNumberOpt, lines)
-      mutableNumberOpt.value.get
-    }
-  }
-
-  protected def load(modelFilename:String):LstmParameters = {
+  protected def loadFromFile(modelFilename:String):LstmParameters = {
     val dynetFilename = modelFilename + ".rnn"
     val x2iFilename = modelFilename + ".x2i"
     val (w2i, c2i, dim) = Serializer.using(Source.fromFile(x2iFilename, "UTF-8")) { source =>
-      def stringToString(string: String): String = string
-      def stringToChar(string: String): Char = string.charAt(0)
-
-      val byLineStringMapBuilder = new ByLineMapBuilder(stringToString)
-      val byLineCharMapBuilder = new ByLineMapBuilder(stringToChar)
-
-      val lines = source.getLines()
-      val w2i = byLineStringMapBuilder.build(lines)
-      // val t2i = byLineStringMapBuilder.build(lines)
-      val c2i = byLineCharMapBuilder.build(lines)
-      // val i2t = new ByLineArrayBuilder().build(lines)
-      val dim = new ByLineIntBuilder().build(lines)
-
-      (w2i, c2i, dim)
+      loadX2I(source)
     }
 
     val oldModel = {
@@ -480,7 +468,7 @@ object Factuality {
     i2s
   }
 
-  def mkVocabs(trainSentences:Array[Array[String]], w2v:Word2Vec): (Map[String, Int], Map[Char, Int]) = {
+  def mkVocabs(trainSentences:Array[Array[String]], w2v:Embedder): (Map[String, Int], Map[Char, Int]) = {
     val chars = new mutable.HashSet[Char]()
     for(sentence <- trainSentences) {
       for(word <- sentence.slice(2,sentence.length)) {
@@ -492,7 +480,7 @@ object Factuality {
 
     val commonWords = new ListBuffer[String]
     commonWords += UNK_WORD // the word at position 0 is reserved for unknown words
-    for(w <- w2v.matrix.keySet.toList.sorted) {
+    for(w <- w2v.words.sorted) {
       commonWords += w
     }
 
@@ -524,76 +512,6 @@ object Factuality {
       charLookupParameters, charFwBuilder, charBwBuilder)
   }
 
-  def apply(modelFilename:String): Factuality = {
-    // make sure DyNet is initialized!
-    Initialize.initialize(Map("random-seed" -> RANDOM_SEED))
-
-    // now load the saved model
-    val rnn = new Factuality()
-    rnn.model = load(modelFilename)
-    rnn
-  }
-
-  def main(args: Array[String]): Unit = {
-    val props = StringUtils.argsToProperties(args)
-
-    if(props.size() < 2) {
-      usage()
-      System.exit(1)
-    }
-
-    if(props.containsKey("train") && props.containsKey("dev") && props.containsKey("embed")) {
-      logger.debug("Starting training procedure...")
- 
-      var rawtrainSentences = ColumnReader.readColumns(props.getProperty("train"))
-      // one sentence can conatin more than one predicates that annotated with factuality
-      // convert to format Array[String]: position_predicate, factuality, sentence words
-      val trainSentences = sentences2Instances(rawtrainSentences)
-
-
-      var rawdevSentences = ColumnReader.readColumns(props.getProperty("dev"))
-      val devSentences = sentences2Instances(rawdevSentences)
-
-      val embeddingsFile = props.getProperty("embed")
-
-      val rnn = new Factuality()
-
-      if(props.containsKey("model")) {
-        val modelFilePrefix = props.getProperty("model")
-        val devFileStr = props.getProperty("dev").split('/').last
-        val devOutputPrefix = "model_" + modelFilePrefix + ".dev_" + devFileStr + ".epoch_"
-        rnn.initialize(trainSentences, embeddingsFile)
-        rnn.train(trainSentences, devSentences, devOutputPrefix)
-        save(modelFilePrefix, rnn.model)
-      }
-    }
-
-    if(props.containsKey("model") && props.containsKey("test")) {
-      logger.debug("Starting evaluation procedure...")
-      val modelFilePrefix = props.getProperty("model")
-      val testFileStr = props.getProperty("test").split('/').last
-      val testOutputPrefix = "model_" + modelFilePrefix + ".test_" + testFileStr + ".epoch_"
-      val rawtestSentences = ColumnReader.readColumns(props.getProperty("test"))
-      val testSentences = sentences2Instances(rawtestSentences)
-
-      val rnn = Factuality(modelFilePrefix)
-      rnn.evaluate(testSentences, testOutputPrefix)
-
-    }
-  }
-
-  def usage(): Unit = {
-    val rnn = new Factuality
-    println("Usage: " + rnn.getClass.getName + " <ARGUMENTS>")
-    println("Accepted arguments:")
-    println("\t-train <training corpus in the CoNLL BIO or IO format>")
-    println("\t-embed <embeddings file in the word2vec format")
-    println("\t-model <prefix of the model file name>")
-    println("\t-dev <development corpus in the CoNLL BIO or IO format>")
-    println("\t-test <test corpus in the CoNLL BIO or IO format>")
-
-  }
-
   def sentences2Instances(rawSentences: Array[Array[Row]]): Array[Array[String]] = {
     // convert to the format that each line corresponds to one predicate,
     // specifically, each line is in the format of [factuality socre, predicate position, words in sentence] 
@@ -618,4 +536,3 @@ object Factuality {
     sentences.toArray
   }
 }
-
