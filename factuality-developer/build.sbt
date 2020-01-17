@@ -14,3 +14,8 @@ libraryDependencies ++= Seq(
   "org.clulab" %% "processors-main" % "7.5.1", // Word2Vec
   "org.clulab" % "glove-42b-300d" % "0.1.0"
 )
+
+assemblyMergeStrategy in assembly := {
+  case PathList("META-INF", "MANIFEST.MF") => MergeStrategy.discard
+  case _ => MergeStrategy.first
+}
