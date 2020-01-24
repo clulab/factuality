@@ -1,7 +1,5 @@
 name := "factuality"
 
-lazy val keith = "keith"
-
 organization := "org.clulab"
 
 scalaVersion := "2.12.6"
