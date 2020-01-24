@@ -15,7 +15,7 @@ first and it takes precedence.  New models don't necessarily need any more deplo
 ## Project resource
 
 Files placed into the `src/main/resources` directory of a project can be accessed as resources.  `sbt` seems to always
-add these files to jars and that strategy should be compatible, although creating the large jar files can be time
+add these files to jars and that strategy should work with this project, although creating the large jar files can be time
 consuming.  IntelliJ can leave resources as is and manipulate the classpath to enable access.  This is temporarily
 not compatible with model reading code in `fatdynet` until the dependency is updated.
 
@@ -33,7 +33,7 @@ these files are copied into the jar file along with the model.
 1. Run `$ sbt factuality-models/publishLocal`.
 1. Update library dependencies.  For instance, `factuality-client/build.sbt` may need an updated line
 `"org.clulab" % "factuality-models" % "0.2.0-SNAPSHOT"`.
-1. If the name of your model is no longer `FTrainFDevScim3` which is used in some of the code, update the code.
+1. If the name of your model is no longer `FTrainFDevScim3` as is used in some of the code, update the code.
 If it is no longer located at `org/clulab/factuality/models`, make similar modifications.
 
 ## sbt release
@@ -55,6 +55,6 @@ these files are copied into the jar file along with the model.
 the push to GitHub at the end, because some additional files need to be updated.
 1. Update library dependencies.  For instance, `factuality-client/build.sbt` may need an updated line
 `"org.clulab" % "factuality-models" % "0.3.0"`.
-1. If the name of your model is no longer `FTrainFDevScim3` which is used in some of the code, update the code.
+1. If the name of your model is no longer `FTrainFDevScim3` as is used in some of the code, update the code.
 If it is no longer located at `org/clulab/factuality/models`, similar modifications may be necessary.
 1. Commit these later changes to GitHub, push, and start a pull request.
