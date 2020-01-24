@@ -1,14 +1,12 @@
 *.class
 *.log
-.idea
-.idea/*
-*.iml
-core/*.iml
-.#*
-.DS_Store
-Makefile
 
 # sbt specific
+.cache
+.cache-*
+.history
+.lib/
+#.sbtopts
 dist/*
 target/
 lib_managed/
@@ -18,3 +16,25 @@ project/plugins/project/
 
 # Scala-IDE specific
 .scala_dependencies
+.worksheet
+
+# IntelliJ
+.idea
+
+# Eclipse
+.classpath
+.project
+.settings/org.eclipse.core.resources.prefs
+
+# GitKraken
+\.classpath
+
+# ~ files
+*~
+
+# For MacOS filesystem
+.DS_Store
+
+resources/*
+!resources/.gitempty
+

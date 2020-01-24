@@ -18,11 +18,11 @@ import org.clulab.factuality.utils.MathUtils
 import org.clulab.factuality.utils.Serializer
 import org.clulab.fatdynet.utils.CloseableModelSaver
 import org.clulab.fatdynet.utils.Closer.AutoCloser
-import org.clulab.sequences._
 
 import scala.collection.mutable
 import scala.io.Source
 import scala.util.Random
+import scala.util.Try
 
 class Factuality {
   var model:LstmParameters = _
@@ -257,7 +257,7 @@ class Factuality {
     logger.debug(s"Character vocabulary has ${c2i.size} entries.")
 
     logger.debug("Initializing DyNet...")
-    Initialize.initialize(Map("random-seed" -> RANDOM_SEED))
+    Initialize.initialize(Map("random-seed" -> RANDOM_SEED, "dynet-mem" -> "1024"))
     model = mkParams(w2i, c2i, w2v.dimensions)
 
     model.initializeEmbeddings(w2v)
@@ -330,15 +330,12 @@ object Factuality {
 
   def apply(modelFilename:String, fromResource: Boolean = true): Factuality = {
     // make sure DyNet is initialized!
-    Initialize.initialize(Map("random-seed" -> RANDOM_SEED))
+    Initialize.initialize(Map("random-seed" -> RANDOM_SEED, "dynet-mem" -> "1024"))
 
-    // now load the saved model
     val rnn = new Factuality()
-    rnn.model =
-        if (fromResource)
-          loadFromResource(modelFilename)
-        else
-          loadFromFile(modelFilename)
+
+    rnn.model = Try(loadFromFile(modelFilename))
+        .getOrElse(loadFromResource(modelFilename))
     rnn
   }
 
@@ -395,14 +392,15 @@ object Factuality {
     (w2i, c2i, dim)
   }
 
-  protected def loadFromResource(modelFilename: String): LstmParameters = {
+  protected def loadFromResource(modelFilename: String): LstmParameters =
+      loadFromResource(modelFilename, this.getClass.getClassLoader)
+
+  protected def loadFromResource(modelFilename: String, classLoader: ClassLoader): LstmParameters = {
     val dynetFilename = modelFilename + ".rnn"
     val x2iFilename = modelFilename + ".x2i"
     // This code will soon appear in fatdynet
     val zipname = {
-      val classLoader = this.getClass.getClassLoader
       val resourceName = dynetFilename
-
       val url = classLoader.getResource(resourceName)
       if (Option(url).isEmpty)
         throw new RuntimeException(s"ERROR: cannot locate the model file $resourceName!")
@@ -415,15 +413,14 @@ object Factuality {
         val uri = new URI(jarUrl.toString)
         // This converts both percent encoded characters and file separators.
         val nativeJarFileName = new File(uri).getCanonicalPath
-        val resourceFileName = uri.getPath
 
-        resourceFileName
+        nativeJarFileName
       }
       else
         throw new RuntimeException(s"ERROR: cannot process the model file $resourceName!")
     }
 
-    val (w2i, c2i, dim) = Serializer.using(Source.fromResource(x2iFilename, this.getClass.getClassLoader)("UTF-8")) { source =>
+    val (w2i, c2i, dim) = Serializer.using(Source.fromResource(x2iFilename, classLoader)("UTF-8")) { source =>
       loadX2I(source)
     }
 

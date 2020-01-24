@@ -6,7 +6,7 @@ import scala.collection.mutable.ArrayBuffer
 class TestFactuality extends FlatSpec with Matchers {
   // val proc:Processor = new BioCluProcessor
   // val s1 = "Cells were additionally stimulated with 10 ng/ml NRG and cell extracts analyzed for ErbB3 tyrosine phosphorylation"
-  val rnn: Factuality = Factuality("fact", fromResource = false)
+  val rnn: Factuality = Factuality("model", fromResource = false)
   // rnn.evaluate(testSentences)
 
   // sci dataset

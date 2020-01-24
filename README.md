@@ -134,11 +134,5 @@ model called `model`, then the command would be
 sbt:factuality> factuality-developer/runMain org.clulab.factuality.FactualityPredictor -test test.conll -model model
 ```
 
-In this example, the model is read from a file in the current directory.  If the model is placed in the resource
-directory of the factuality-developer project at `factuality-developer/src/main/resources/org/clulab/factuality/models`,
-for example, then it could be read as a resource with
-```sh
-sbt:factuality> factuality-developer/runMain org.clulab.factuality.FactualityPredictor -test test.conll -model org/clulab/factuality/models/model
-```
-However, it takes a long time to package models, so this is only efficient if the package can be reused.
-For more tips on deploying, publishing, and releasing the models, see the factuality-models subproject.
+The factuality-client can also use the new model via `val factuality = Factuality("model")`.
+For tips on deploying, publishing, and releasing the models, see the factuality-models subproject.

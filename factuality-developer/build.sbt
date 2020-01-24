@@ -1,6 +1,6 @@
 name := "factuality-developer"
 
-version := "0.1.0-SNAPSHOT"
+version := "1.0.0-SNAPSHOT"
 
 organization := "org.clulab"
 
@@ -12,7 +12,10 @@ resolvers += "Artifactory" at "http://artifactory.cs.arizona.edu:8081/artifactor
 
 libraryDependencies ++= Seq(
   "org.clulab" %% "processors-main" % "7.5.1", // Word2Vec
-  "org.clulab" % "glove-42b-300d" % "0.1.0"
+  "org.clulab" % "glove-42b-300d" % "0.1.0",
+
+  // testing
+  "org.scalatest" %% "scalatest" % "3.0.1" % "test"
 )
 
 assemblyMergeStrategy in assembly := {

@@ -24,11 +24,11 @@ object FactualityPredictor {
       val rawtestSentences = ColumnReader.readColumns(props.getProperty("test"))
       val testSentences = Factuality.sentences2Instances(rawtestSentences)
 
-      val modelFilePrefix = props.getProperty("model")
-      val rnn = Factuality(modelFilePrefix) // kwa which version is this?
-
+      val modelFileStr = props.getProperty("model")
+      val rnn = Factuality(modelFileStr)
+      val safeModelFileStr = modelFileStr.split('/').last
       val testFileStr = props.getProperty("test").split('/').last
-      val testOutputPrefix = "model_" + modelFilePrefix + ".test_" + testFileStr + ".epoch_"
+      val testOutputPrefix = "model_" + safeModelFileStr + ".test_" + testFileStr + ".epoch_"
 
       rnn.evaluate(testSentences, testOutputPrefix)
     }

@@ -1,5 +1,8 @@
 package org.clulab.factuality
 
+import java.io.File
+import java.io.FileInputStream
+
 import org.clulab.embeddings.word2vec.Word2Vec
 import org.clulab.factuality.Factuality._
 import org.clulab.sequences._
@@ -7,6 +10,7 @@ import org.clulab.utils.StringUtils
 import org.clulab.factuality.utils.Serializer
 
 import scala.io.Source
+import scala.util.Try
 
 object FactualityTrainer {
 
@@ -23,11 +27,31 @@ object FactualityTrainer {
 
   object Word2VecEmbedder {
 
-    def apply(embeddingsResource: String): Word2VecEmbedder = {
-      logger.debug(s"Loading embeddings from file $embeddingsResource...")
-      val w2v = Serializer.using(Source.fromResource(embeddingsResource, getClass.getClassLoader)) { source =>
-          new Word2Vec(source, None)
+    protected def applyFromFile(embeddingsResource: String): Word2Vec = {
+      val stream = new FileInputStream(new File(embeddingsResource))
+
+      Serializer.using(stream) { source =>
+        new Word2Vec(source, None)
       }
+    }
+
+    protected def applyFromResource(embeddingsResource: String): Word2Vec = {
+      val classLoader = getClass.getClassLoader
+      // Important note: This must be a Stream rather than a Source (Source.fromResource)
+      // because the file is encoded as iso-8859-1.  See Word2Vec.loadMatrixFromStream.
+      val stream = classLoader.getResourceAsStream(embeddingsResource)
+
+      Serializer.using(stream) { stream =>
+        new Word2Vec(stream, None)
+      }
+    }
+
+    def apply(embeddingsResource: String): Word2VecEmbedder = {
+      logger.debug(s"Loading embeddings from $embeddingsResource...")
+      val w2v1 = Try(applyFromFile(embeddingsResource))
+      val w2v2 = w2v1.orElse(Try(applyFromResource(embeddingsResource)))
+      val w2v = w2v2.get
+
       logger.debug(s"Completed loading embeddings for a vocabulary of size ${w2v.matrix.size}.")
       new Word2VecEmbedder(w2v)
     }
@@ -45,7 +69,7 @@ object FactualityTrainer {
       logger.debug("Starting training procedure...")
  
       val rawtrainSentences = ColumnReader.readColumns(props.getProperty("train"))
-      // one sentence can conatin more than one predicates that annotated with factuality
+      // one sentence can contain more than one predicates that annotated with factuality
       // convert to format Array[String]: position_predicate, factuality, sentence words
       val trainSentences = sentences2Instances(rawtrainSentences)
       val rawdevSentences = ColumnReader.readColumns(props.getProperty("dev"))
@@ -70,10 +94,10 @@ object FactualityTrainer {
       val modelFilePrefix = props.getProperty("model")
       val testFileStr = props.getProperty("test").split('/').last
       val testOutputPrefix = "model_" + modelFilePrefix + ".test_" + testFileStr + ".epoch_"
-      val rawtestSentences = ColumnReader.readColumns(props.getProperty("test"))
+      val rawtestSentences = ColumnReader.readColumnsFromFile(props.getProperty("test"))
       val testSentences = sentences2Instances(rawtestSentences)
 
-      val rnn = Factuality(modelFilePrefix) // kwa which version is this?
+      val rnn = Factuality(modelFilePrefix)
       rnn.evaluate(testSentences, testOutputPrefix)
     }
   }
