@@ -48,14 +48,14 @@ pomIncludeRepository := { _ => false }
 
 scmInfo := Some(
   ScmInfo(
-    url("https://github.com/clulab/factuality-models"),
-    "scm:git:https://github.com/clulab/factuality-models.git"
+    url("https://github.com/clulab/factuality/tree/master/factuality-models"),
+    "scm:git:https://github.com/clulab/factuality.git"
   )
 )
 
 // This must be added to add to the pom for publishing.
 pomExtra :=
-  <url>https://github.com/clulab/factuality-models</url>
+  <url>https://github.com/clulab/factuality/tree/master/factuality-models</url>
   <licenses>
     <license>
       <name>Apache License, Version 2.0</name>
@@ -83,6 +83,7 @@ releaseProcess := Seq[ReleaseStep](
 //  releaseStepCommandAndRemaining("+publish"),
   releaseStepCommandAndRemaining("+publishLocal"),
   setNextVersion,
-  commitNextVersion,
-  pushChanges
+  // Clean up some of the client files manually...
+//  commitNextVersion,
+//  pushChanges
 )

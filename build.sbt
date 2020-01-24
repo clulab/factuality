@@ -1,8 +1,11 @@
+import ReleaseTransformations._
+
 name := "factuality"
 
 organization := "org.clulab"
 
 scalaVersion := "2.12.6"
+crossScalaVersions := Seq("2.11.11", "2.12.6")
 
 scalacOptions ++= Seq("-feature", "-unchecked", "-deprecation")
 
@@ -23,3 +26,56 @@ lazy val `factuality-developer` = project
 lazy val `factuality-models` = project
 
 lazy val `factuality-client` = project
+
+publishMavenStyle := true
+
+// the standard maven repository
+publishTo := {
+  val nexus = "https://oss.sonatype.org/"
+  if (isSnapshot.value)
+    Some("snapshots" at nexus + "content/repositories/snapshots")
+  else
+    Some("releases" at nexus + "service/local/staging/deploy/maven2")
+}
+
+// let’s remove any repositories for optional dependencies in our artifact
+pomIncludeRepository := { _ => false }
+
+scmInfo := Some(
+  ScmInfo(
+    url("https://github.com/clulab/factuality"),
+    "scm:git:https://github.com/clulab/factuality.git"
+  )
+)
+
+pomExtra :=
+    <url>https://github.com/clulab/factuality</url>
+    <licenses>
+      <license>
+        <name>Apache License, Version 2.0</name>
+        <url>http://www.apache.org/licenses/LICENSE-2.0.html</url>
+        <distribution>repo</distribution>
+      </license>
+    </licenses>
+    <developers>
+      <developer>
+        <id>mihai.surdeanu</id>
+        <name>Mihai Surdeanu</name>
+        <email>mihai@surdeanu.info</email>
+      </developer>
+    </developers>
+
+releaseProcess := Seq[ReleaseStep](
+  checkSnapshotDependencies,
+  inquireVersions,
+  runClean,
+  runTest,
+  setReleaseVersion,
+  commitReleaseVersion,
+  tagRelease,
+  releaseStepCommandAndRemaining("+publishSigned"),
+  setNextVersion,
+  commitNextVersion,
+  releaseStepCommandAndRemaining("sonatypeReleaseAll"),
+  pushChanges
+)
