@@ -8,8 +8,6 @@ scalaVersion := "2.12.6"
 
 crossPaths := false // This is a resource only and is independent of Scala version.
 
-//lazy val core = project in file(".")
-
 // Put these files next to the model, in part so they don't conflict with other dependencies.
 mappings in (Compile, packageBin) ++= Seq(
   file("./README.md") -> "org/clulab/factuality/models/README.md",
