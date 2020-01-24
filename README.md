@@ -105,16 +105,16 @@ If you cannot use `sbt` interactively, quote all the arguments and send them en 
 $ sbt 'factuality-developer/runMain org.clulab.factuality.FactualityTrainer -train train.conll -dev dev.conll -test test.conll -model model -embed org/clulab/glove/glove.42B.300d.txt'
 ```
 
-If you have no access to `sbt` on the computer that does the training, but there is at least Java there (e.g., on
+If you have no access to `sbt` on the computer that does the training, but there is at least Java (e.g., on
 some HPCs), the project needs to be assembled on a computer that does have `sbt`, and then the assembly can be moved
 to the training computer.  Run
 ```sh
 sbt:factuality> factuality-developer/assembly
 ```
 locally, and then copy the file `factuality-developer-assembly-1.0.0-SNAPSHOT.jar` (or similar, depending what
-version we're on) in directory `factuality-developer/target/scala-2.12/` to the other computer.  There run
+version you're on) in directory `factuality-developer/target/scala-2.12/` to the other computer.  There run
 ```sh
-java -cp factuality-developer-assembly-1.0.0-SNAPSHOT.jar org.clulab.factuality.FactualityTrainer -train train.conll -dev dev.conll -test test.cnll -model model -embed org/clulab/glove/glove.42B.300d.txt
+$ java -cp factuality-developer-assembly-1.0.0-SNAPSHOT.jar org.clulab.factuality.FactualityTrainer -train train.conll -dev dev.conll -test test.cnll -model model -embed org/clulab/glove/glove.42B.300d.txt
 ```
 
 In these examples, the train, dev, and test "files" are really resources that are included in the project.
@@ -128,6 +128,8 @@ You could use other ones.
 sbt:factuality> factuality-developer/runMain org.clulab.factuality.FactualityTrainer -train factuality-developer/src/main/resources/train.conll -dev factuality-developer/src/main/resources/dev.conll -test factuality-developer/src/main/resources/test.cnll -model model -embed org/clulab/glove/glove.42B.300d.txt
 ``` 
 
+### How to evaluate a model
+
 To evaluate your model after training, use the `FactualityPredictor` program.  If you have just generated a
 model called `model`, then the command would be
 ```sh
@@ -135,4 +137,7 @@ sbt:factuality> factuality-developer/runMain org.clulab.factuality.FactualityPre
 ```
 
 The factuality-client can also use the new model via `val factuality = Factuality("model")`.
+
+### How to share a model
+
 For tips on deploying, publishing, and releasing the models, see the factuality-models subproject.
