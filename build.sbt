@@ -4,8 +4,8 @@ name := "factuality"
 
 organization := "org.clulab"
 
-scalaVersion := "2.12.6"
-crossScalaVersions := Seq("2.11.11", "2.12.6")
+// This is presently not compatible with Scala 2.11.
+//crossScalaVersions := Seq("2.11.11", "2.12.6")
 
 scalacOptions ++= Seq("-feature", "-unchecked", "-deprecation")
 
