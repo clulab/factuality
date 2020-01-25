@@ -10,8 +10,9 @@ crossPaths := false // This is a resource only and is independent of Scala versi
 
 // Put these files next to the model, in part so they don't conflict with other dependencies.
 mappings in (Compile, packageBin) ++= Seq(
-  file("./README.md") -> "org/clulab/factuality/models/README.md",
-  file("./CHANGES.md") -> "org/clulab/factuality/models/CHANGES.md"
+  file("./factuality-models/README.md") -> "org/clulab/factuality/models/README.md",
+  file("./factuality-models/CHANGES.md") -> "org/clulab/factuality/models/CHANGES.md",
+  file("./factuality-models/LICENSE") -> "org/clulab/factuality/models/LICENSE"
 )
 
 publishArtifact in (Compile, packageBin) := true // Do include the resources.
