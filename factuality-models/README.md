@@ -50,7 +50,7 @@ for which one also needs access.
 1. `version.sbt` will be managed by the `release` plugin.
 1. You may want to update `CHANGES.md` or add some documentation to this `README.md` about the new model because
 these files are copied into the jar file along with the model.
-1. Run `$ sbt factuality-models/release`.
+1. In `sbt` run `sbt:factuality> project factuality-models` and then `sbt:factuality-models release`.
 1. Answer questions about versions, enter passwords, etc.  Wait a long time.  Generally answer no about
 the push to GitHub at the end, because some additional files need to be updated.
 1. Update library dependencies.  For instance, `factuality-client/build.sbt` may need an updated line
