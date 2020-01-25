@@ -24,13 +24,10 @@ import scala.util.Random
 
  
 class TestFactuality extends FlatSpec with Matchers {
-  // val proc:Processor = new BioCluProcessor
-  // val s1 = "Cells were additionally stimulated with 10 ng/ml NRG and cell extracts analyzed for ErbB3 tyrosine phosphorylation"
-  val rnn = Factuality("fact")
-  // rnn.evaluate(testSentences)
+  val rnn = Factuality("FTrainFDevScim3")
 
   // sci dataset
-  "Factuality" should "be about 3 as definitedly happened if the predicate is in the form of -ed and in a descriptive statment" in {
+  "Factuality" should "be about 3 as definitly happened if the predicate is in the form of -ed and in a descriptive statment" in {
     val words = Array("Parthenolide", "induced", "apoptosis", "and", "inhibited", "cell", "proliferation", "and", "the", "expression", "of", "VEGF", "in", "vitro", ".")
     val p = 1
     val gold_fact = 3.0
@@ -39,7 +36,7 @@ class TestFactuality extends FlatSpec with Matchers {
     (pred_fact - gold_fact) should be (0.0 +- 0.5)
   }
 
-  it should "be about 3 as definitedly happened if the predicate is a present tense verb describing a finding, obeservation or conclusion" in {
+  it should "be about 3 as definitly happened if the predicate is a present tense verb describing a finding, obeservation or conclusion" in {
     val text_tokenization = "(0,These,DT), (1,findings,NNS), (2,indicate,VBP), (3,that,IN), (4,JTP-74057,NN), (5,and,CC), (6,PD0325901,NN), (7,suppress,VBP), (8,ERK,NN), (9,phosphorylation,NN), (10,and,CC), (11,hence,RB), (12,affect,VB), (13,the,DT), (14,subsequent,JJ), (15,downstream,JJ), (16,signaling,NN), (17,cascade,NN), (18,,,,), (19,thereby,RB), (20,inhibiting,VBG), (21,to,TO), (22,cell,NN), (23,cycle,NN), (24,progression,NN), (25,.,.)"
     val words = tokenization2words(text_tokenization)
     val p = 7
@@ -59,20 +56,20 @@ class TestFactuality extends FlatSpec with Matchers {
     (pred_fact - gold_fact) should be (0.0 +- 0.5)
   }
 
-  it should "be about 2.25 as probably happened if use quantifiers, such as most, to talk about quantities, amounts and degree" in {
-    val text_tokenization = "(0,In,IN), (1,most,JJS), (2,cases,NNS), (3,cPLA2,NN), (4,is,VBZ), (5,upregulated,VBN), (6,;,:), (7,for,IN), (8,example,NN), (9,,,,), (10,in,IN), (11,human,NN), (12,lung,NN), (13,tumor,NN), (14,cells,NNS), (15,cPLA2,NN), (16,activation,NN), (17,by,IN), (18,oncogenic,JJ), (19,Ras,NN), (20,has,VBZ), (21,been,VBN), (22,reported,VBN), (23,[,-LRB-), (24,88,CD), (25,],-RRB-), (26,.,.)"
+  it should "be about 2.25 as probably happened if under certain condition" in {
+    val text_tokenization = "(0,In,IN), (1,summary,NN), (2,,,,), (3,renal,JJ), (4,mineralocorticoid,NN), (5,receptor,NN), (6,activation,NN), (7,does,VBZ), (8,not,RB), (9,appear,VB), (10,to,TO), (11,be,VB), (12,the,DT), (13,main,JJ), (14,determinant,NN), (15,of,IN), (16,hypertension,NN), (17,in,IN), (18,most,JJS), (19,patients,NNS), (20,with,IN), (21,CS,NNP), (22,,,,), (23,except,IN), (24,in,IN), (25,those,DT), (26,with,IN), (27,extremely,RB), (28,elevated,JJ), (29,circulating,VBG), (30,cortisol,NN), (31,levels,NNS), (32,where,WRB), (33,renal,JJ), (34,mineralocorticoid,NN), (35,receptor,NN), (36,hyperactivation,NN), (37,contributes,VBZ), (38,to,TO), (39,additional,JJ), (40,sodium,NN), (41,and,CC), (42,fluid,NN), (43,retention,NN), (44,,,,), (45,beyond,IN), (46,the,DT), (47,increased,JJ), (48,excretion,NN), (49,of,IN), (50,potassium,NN), (51,and,CC), (52,consequent,JJ), (53,hypokalemia,NN), (54,.,.)"
     val words = tokenization2words(text_tokenization)
-    val p = 16
+    val p = 37
     val gold_fact = 2.25
     val pred_fact = rnn.predict(words, p)
  
     (pred_fact - gold_fact) should be (0.0 +- 0.5)
   }
 
-  it should "be about 0.75 as possiblely happened if the predicate is used in a hypothesis" in {
-    val text_tokenization = "(0,To,TO), (1,identify,VB), (2,whether,IN), (3,the,DT), (4,downregulation,NN), (5,of,IN), (6,KRAS,NNP), (7,alone,RB), (8,inhibits,VBZ), (9,the,DT), (10,proliferation,NN), (11,of,IN), (12,the,DT), (13,TE-1,NN), (14,cell,NN), (15,line,NN), (16,,,,), (17,a,DT), (18,small,JJ), (19,interfering,VBG), (20,(,-LRB-), (21,si,FW), (22,),-RRB-), (23,K-ras,FW), (24,expression,NN), (25,vector,NN), (26,was,VBD), (27,constructed,VBN), (28,.,.)"
+  it should "be about 0.75 as possiblely happened if a modal auxiliary verb is used to indicate possibility" in {
+    val text_tokenization = "(0,Thus,RB), (1,,,,), (2,besides,IN), (3,the,DT), (4,PM,NNP), (5,pool,NN), (6,of,IN), (7,Raf,NN), (8,,,,), (9,H-Ras,JJ), (10,(,-LRB-), (11,12V,NN), (12,)-8RK,-RRB-), (13,may,MD), (14,accumulate,VB), (15,at,IN), (16,high,JJ), (17,enough,JJ), (18,levels,NNS), (19,in,IN), (20,many,JJ), (21,other,JJ), (22,cell,NN), (23,compartments,NNS), (24,to,TO), (25,activate,VB), (26,Raf,NN), (27,,,,), (28,as,RB), (29,well,RB), (30,as,IN), (31,additional,JJ), (32,Ras,NN), (33,effectors,NNS), (34,.,.)"
     val words = tokenization2words(text_tokenization)
-    val p = 8
+    val p = 25
     val gold_fact = 0.75
     val pred_fact = rnn.predict(words, p)
  
@@ -80,9 +77,9 @@ class TestFactuality extends FlatSpec with Matchers {
   }
 
   // UDS-IH2 dataset
-  it should "be about -1.875 as possible not happened if the predicate is in doubt" in {
-    val words = Array("do", "n't", "they", "know", "we", "have", "better", "things", "to", "do")
-    val p = 9
+  it should "be about -1.875 as possible not happened if the predicate is in a request" in {
+    val words = Array("Can", "you", "pass", "this", "along", "to", "Elizabeth", "to", "ensure", "Sanders", "is", "on", "board", "as", "well", "?")
+    val p = 2
     val gold_fact = -1.875
     val pred_fact = rnn.predict(words, p)
  
@@ -91,7 +88,7 @@ class TestFactuality extends FlatSpec with Matchers {
 
 
   it should "be about -2.25 as probably not happened if the predicate is under assumption" in {
-    val words = Array("What", "if", "Google", "expanded", "on", "its", "search", "-", "engine", "(", "and", "now", "e-mail", ")", "wares", "into", "a", "full", "-", "fledged", "operating", "system", "?")
+    val words = Array("If", "the", "PX", "comes", "back", "again", ",", "I", "will", "call", "their", "in", "-", "house", "attys", ".")
     val p = 3
     val gold_fact = -2.25
     val pred_fact = rnn.predict(words, p)
@@ -119,8 +116,8 @@ class TestFactuality extends FlatSpec with Matchers {
   }
 
   it should "be about -2.625 as very likely not happened when say the action is required or necessary" in {
-    val words = Array("You", "have", "to", "see", "these", "slides", "....", "they", "are", "amazing", ".")
-    val p = 3
+    val words = Array("In", "such", "case", ",", "you", "should", "destroy", "this", "message", "and", "kindly", "notify", "the", "sender", "by", "reply", "email", ".")
+    val p = 6
     val gold_fact = -2.625
     val pred_fact = rnn.predict(words, p)
  
