@@ -29,7 +29,7 @@ factuality score for a tokenized influence statement.  The code and build files 
 To use the published factuality library and the pretrained model, you do not need to "install" or clone this repo.
 The factuality library has been published and can be incorporated into your project by adding the following
 dependencies to your `build.sbt` file:
-```scala
+```Scala
 resolvers += "Artifactory" at "http://artifactory.cs.arizona.edu:8081/artifactory/sbt-release"
 
 libraryDependencies ++= Seq(
@@ -45,7 +45,7 @@ but the additional resolver is needed for the large models can't be distributed 
 
 If you simply want to access the factuality library in your project, add the above library dependencies to your
 dependency manager and use the API demonstrated below to evaluate the factuality of an event in a given sentence:
-```scala
+```Scala
 import org.clulab.factuality.Factuality
   ...
   // This particular model is provided in the library dependency.
@@ -65,7 +65,7 @@ in a resource called `FTrainFDevScim3`.  The names of the models are subject to 
 may want to rename their own resources to distinguish models.
 
 If you did go ahead and clone the repo, the factuality-client example program can be run with
-```shell script
+```sh
 sbt:factuality> factuality-client/run
 ``` 
 
@@ -88,7 +88,7 @@ This is a standard `sbt` project, so use the usual commands (i.e., `compile`, `r
 manipulate it (or open it with IntelliJ).  Training will likely require an HPC, so some of the examples below
 are geared toward that.
 
-```shell script
+```sh
 $ sbt
 sbt:factuality> factuality-developer/compile
 ```
@@ -124,7 +124,7 @@ be output in files `model.rnn` and `model.x2i`.
 If you want to use different data sets, it is possible to override the conll resources and specify a local file
 instead.  The following command reads the files from the disk that happen to be supplied with the source code.
 You could use other ones.
-```
+```sh
 sbt:factuality> factuality-developer/runMain org.clulab.factuality.FactualityTrainer -train factuality-developer/src/main/resources/train.conll -dev factuality-developer/src/main/resources/dev.conll -test factuality-developer/src/main/resources/test.cnll -model model -embed org/clulab/glove/glove.42B.300d.txt
 ``` 
 

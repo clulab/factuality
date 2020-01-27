@@ -1,6 +1,6 @@
 # factuality-models
 
-There are at least four ways to access models: via
+There are at least four ways to deal with the models: via
 
 1. the filesystem
 1. a project resource
@@ -12,7 +12,7 @@ There are at least four ways to access models: via
 In most cases, training data can be read from either a file or a resource.  The filesystem is checked for the file
 first and it takes precedence.  New models don't necessarily need any more deployment than this.
 
-## Project resource
+## Project Resource
 
 Files placed into the `src/main/resources` directory of a project can be accessed as resources.  `sbt` seems to always
 add these files to jars and that strategy should work with this project, although creating the large jar files can be time
