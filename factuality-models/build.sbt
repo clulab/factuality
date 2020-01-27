@@ -81,8 +81,8 @@ releaseProcess := Seq[ReleaseStep](
   commitReleaseVersion,
   tagRelease,
 //  releaseStepCommandAndRemaining("+publishSigned"),
-//  releaseStepCommandAndRemaining("+publish"),
-  releaseStepCommandAndRemaining("+publishLocal"),
+  releaseStepCommandAndRemaining("+publish"),
+//  releaseStepCommandAndRemaining("+publishLocal"),
   setNextVersion,
   // Clean up some of the client files manually...
 //  commitNextVersion,
