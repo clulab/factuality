@@ -1,66 +1,60 @@
-# factuality-model
+# factuality-models
 
-Deployment to Maven Central is presently not possible because of file size limitations
-there.  The recommended alternative is to publish locally and then copy the generated
-directory structure to the cloud or clulab servers from which the files can be retrieved
-and used by client programs.  See the factuality-client for hints on how to access the
-models.
+There are at least four ways to deal with the models: via
 
-## Local Deployment
+1. the filesystem
+1. a project resource
+1. sbt publishLocal
+1. sbt release
 
-### Introduction
+## Filesystem
 
-This project is used to publish factuality models locally and only need concern
-those people who are able to able to train the models, which generally requires an HPC
-cluster.  The local models can be transferred to the cloud where others can retrieve
-them for use with the factuality-client.  These instructions generally match those
-for deployment to Maven Central, but stop short of the release step.  Manual intervention
-is required after that.
+In most cases, training data can be read from either a file or a resource.  The filesystem is checked for the file
+first and it takes precedence.  New models don't necessarily need any more deployment than this.
 
-### Instructions
+## Project Resource
 
-### Instructions
-1. Replace the empty placeholder model files, fact.rnn and fact.x2i, in
-`src/main/resources/org/clulab/factuality/models` with the actual models
-that should be released.
-1. Update the `README.md` file in `src/main/resources` to document the model files.
-1. Increment the version number in `version.sbt`.
-1. Update `CHANGES.md` to record what has changed about the models.
-1. Create a local version using `sbt publishLocal`
-1. Update the dependency for the `factuality-client` project to the new version
-   and make sure the client runs.  This may require "touching" `../build.sbt`.
-1. Do not bother with `sbt release`, because the files are too large for Maven Central.
-1. Manually copy the locally published model files from your `ivy2` directory, usually
-   `~/.ivy2/local/org.clulab/factuality-models` to, for example, clulab servers at
-   `/data/nlp/models/org.clulab/factuality-models`.
-1. If necessary, update the `README.md` file for the `factuality-client` project so that
-   people know where to find the files.   
-1. Leave the local version in the ivy2 directory for your own use.
-1. Delete the models, which are too large for github, from their `src` directory and
-   restore the placeholders.
-1. Push the changes in `factuality-models` and `factuality-client` to github.
+Files placed into the `src/main/resources` directory of a project can be accessed as resources.  `sbt` seems to always
+add these files to jars and that strategy should work with this project, although creating the large jar files can be time
+consuming.  IntelliJ can leave resources as is and manipulate the classpath to enable access.  This is temporarily
+not compatible with model reading code in `fatdynet` until the dependency is updated.
 
+## sbt publishLocal
 
-## ~~Deployment to Maven Central~~
+This technique is certain to package the model into jar files.  
 
-### ~~Introduction~~
+1. Copy the model into the resource directory of this project, possibly into the place reserved for them at
+`org/clulab/factuality/models`.
+1. Double check that `version.sbt` is as desired so that other models are not overwritten.  They generally land in
+`~/.ivy2/local/org.clulab/factuality-models/jars`.  Version numbers of locally published packages usually end with
+`-SNAPSHOT`.
+1. You may want to update `CHANGES.md` or add some documentation to this `README.md` about the new model because
+these files are copied into the jar file along with the model.
+1. Run `$ sbt factuality-models/publishLocal`.
+1. Update library dependencies.  For instance, `factuality-client/build.sbt` may need an updated line
+`"org.clulab" % "factuality-models" % "0.2.0-SNAPSHOT"`.
+1. If the name of your model is no longer `FTrainFDevScim3` as is used in some of the code, update the code.
+If it is no longer located at `org/clulab/factuality/models`, make similar modifications.
 
-This project is used to deploy factuality models to maven and only need concern
-those people who have the ability to release to maven.  There is a clulab/processors
-wiki page on the subject that explains the steps required to set that up.
+## sbt release
 
-### ~~Instructions~~
-1. Replace the empty placeholder model files, fact.rnn and fact.x2i, in
-`src/main/resources/org/clulab/factuality/models` with the actual models
-that should be released.
-1. Update the `README.md` file in `src/main/resources` to document the model files.
-1. Increment the version number in `version.sbt`.
-1. Update `CHANGES.md` to record what has changed about the models.
-1. Create a local version using `sbt publishLocal`
-1. Update the dependency for the `factuality-client` project to the new version
-   and make sure the client runs.  This may require "touching" `../build.sbt`.
-1. Assuming that you are set up to do so, run `sbt release`.
-1. Remove the local version from the ivy2 directory.
-1. Make sure the client version runs with the remote version.
-1. Delete the models, which are too large for github, from their directory and restore the placeholders.
-1. Push the changes in `factuality-models` and `factuality-client` to github.
+This option (and also `sbt publish`) is only available to authorized personnel who have access to
+`artifactory.cs.arizona.edu`.  With this option, one can publish to the server so that others (the public)
+can then have read access to the model and use it in their own factuality clients.  Because of the size
+of the models, they are not released to the standard providers.  The instructions are almost the same as
+for `sbt publishLocal`.  `release` adds some automatic versioning and also manipulates the GitHub repository,
+for which one also needs access.
+
+1. Copy the model into the resource directory of this project, possibly into the place reserved for them at
+`org/clulab/factuality/models`.
+1. `version.sbt` will be managed by the `release` plugin.
+1. You may want to update `CHANGES.md` or add some documentation to this `README.md` about the new model because
+these files are copied into the jar file along with the model.
+1. In `sbt` run `sbt:factuality> project factuality-models` and then `sbt:factuality-models release`.
+1. Answer questions about versions, enter passwords, etc.  Wait a long time.  Generally answer no about
+the push to GitHub at the end, because some additional files need to be updated.
+1. Update library dependencies.  For instance, `factuality-client/build.sbt` may need an updated line
+`"org.clulab" % "factuality-models" % "0.3.0"`.
+1. If the name of your model is no longer `FTrainFDevScim3` as is used in some of the code, update the code.
+If it is no longer located at `org/clulab/factuality/models`, similar modifications may be necessary.
+1. Commit these later changes to GitHub, push, and start a pull request.

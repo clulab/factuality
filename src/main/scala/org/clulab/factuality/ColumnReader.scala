@@ -1,15 +1,30 @@
-package org.clulab.sequences
+package org.clulab.factuality
+
+import org.clulab.factuality.utils.Serializer
 
 import scala.collection.mutable.ArrayBuffer
 import scala.io.Source
+import scala.util.Try
 
 /**
   * Reads the CoNLL-like column format
   */
 object ColumnReader {
+  def readColumnsFromFile(fn: String): Array[Array[Row]] =
+      Serializer.using(Source.fromFile(fn, "UTF-8")) { source =>
+        readColumns(source)
+      }
+
+  def readColumnsFromResource(fn: String): Array[Array[Row]] =
+      Serializer.using(Source.fromResource(fn)) { source =>
+        readColumns(source)
+      }
+
   def readColumns(fn: String): Array[Array[Row]] = {
-    val source = Source.fromFile(fn)
-    readColumns(source: Source)
+    val result1 = Try(readColumnsFromFile(fn))
+    val result2 = result1.orElse(Try(readColumnsFromResource(fn)))
+
+    result2.get
   }
 
   def readColumns(source: Source): Array[Array[Row]] = {

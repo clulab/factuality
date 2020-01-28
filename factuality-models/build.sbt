@@ -6,6 +6,15 @@ organization := "org.clulab"
 
 scalaVersion := "2.12.6"
 
+crossPaths := false // This is a resource only and is independent of Scala version.
+
+// Put these files next to the model, in part so they don't conflict with other dependencies.
+mappings in (Compile, packageBin) ++= Seq(
+  file("./factuality-models/README.md") -> "org/clulab/factuality/models/README.md",
+  file("./factuality-models/CHANGES.md") -> "org/clulab/factuality/models/CHANGES.md",
+  file("./factuality-models/LICENSE") -> "org/clulab/factuality/models/LICENSE"
+)
+
 publishArtifact in (Compile, packageBin) := true // Do include the resources.
 
 publishArtifact in (Compile, packageDoc) := false // There is no documentation.
@@ -14,44 +23,40 @@ publishArtifact in (Compile, packageSrc) := false // There is no source code.
 
 publishArtifact in (Test, packageBin) := false
 
-// These are the steps to be performed during release.
-releaseProcess := Seq[ReleaseStep](
-  checkSnapshotDependencies,
-//  inquireVersions,
-  runClean,
-  runTest,
-//  setReleaseVersion,
-//  commitReleaseVersion,
-//  tagRelease,
-  ReleaseStep(action = Command.process("publishSigned", _)) //,
-//  setNextVersion,
-//  commitNextVersion,
-    // File upload is unreliable.  Check manually.
-//  ReleaseStep(action = Command.process("sonatypeReleaseAll", _)) //,
-//  pushChanges
-)
-
-// Publish to a maven repo.
 publishMavenStyle := true
 
-// Don't include scala version in artifact; we don't need it.
-crossPaths := false
-
-// This is the standard maven repository.
 publishTo := {
-  val nexus = "https://oss.sonatype.org/"
-  if (isSnapshot.value)
-    Some("snapshots" at nexus + "content/repositories/snapshots")
-  else
-    Some("releases" at nexus + "service/local/staging/deploy/maven2")
+  val artifactory = "http://artifactory.cs.arizona.edu:8081/artifactory/"
+  val repository = "sbt-release-local"
+  val details =
+      if (isSnapshot.value) ";build.timestamp=" + new java.util.Date().getTime
+      else ""
+  val location = artifactory + repository + details
+
+  Some("Artifactory Realm" at location)
 }
+
+credentials += Credentials(Path.userHome / ".sbt" / ".credentials")
+// credentials += Credentials("Artifactory Realm", "<host>", "<user>", "<password>")
+// The above credentials are recorded in ~/.sbt/.credentials as such:
+// realm=Artifactory Realm
+// host=<host>
+// user=<user>
+// password=<password>
 
 // Let’s remove any repositories for optional dependencies in our artifact.
 pomIncludeRepository := { _ => false }
 
-// mandatory stuff to add to the pom for publishing
-pomExtra := (
-  <url>https://github.com/clulab/factuality-models</url>
+scmInfo := Some(
+  ScmInfo(
+    url("https://github.com/clulab/factuality/tree/master/factuality-models"),
+    "scm:git:https://github.com/clulab/factuality.git"
+  )
+)
+
+// This must be added to add to the pom for publishing.
+pomExtra :=
+  <url>https://github.com/clulab/factuality/tree/master/factuality-models</url>
   <licenses>
     <license>
       <name>Apache License, Version 2.0</name>
@@ -59,14 +64,27 @@ pomExtra := (
       <distribution>repo</distribution>
     </license>
   </licenses>
-  <scm>
-    <url>https://github.com/clulab/factuality-models</url>
-    <connection>https://github.com/clulab/factuality-models</connection>
-  </scm>
   <developers>
     <developer>
       <id>mihai.surdeanu</id>
       <name>Mihai Surdeanu</name>
       <email>mihai@surdeanu.info</email>
     </developer>
-  </developers>)
+  </developers>
+
+releaseProcess := Seq[ReleaseStep](
+  checkSnapshotDependencies,
+  inquireVersions,
+  runClean,
+  runTest,
+  setReleaseVersion,
+  commitReleaseVersion,
+  tagRelease,
+//  releaseStepCommandAndRemaining("+publishSigned"),
+  releaseStepCommandAndRemaining("+publish"),
+//  releaseStepCommandAndRemaining("+publishLocal"),
+  setNextVersion,
+  // Clean up some of the client files manually...
+//  commitNextVersion,
+//  pushChanges
+)
