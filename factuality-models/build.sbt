@@ -8,12 +8,20 @@ scalaVersion := "2.12.6"
 
 crossPaths := false // This is a resource only and is independent of Scala version.
 
+autoScalaLibrary := false // Do not depend on Scala libraries since there is no code here.
+
 // Put these files next to the model, in part so they don't conflict with other dependencies.
-mappings in (Compile, packageBin) ++= Seq(
-  file("./factuality-models/README.md") -> "org/clulab/factuality/models/README.md",
-  file("./factuality-models/CHANGES.md") -> "org/clulab/factuality/models/CHANGES.md",
-  file("./factuality-models/LICENSE") -> "org/clulab/factuality/models/LICENSE"
-)
+mappings in (Compile, packageBin) := {
+  val filtered = (mappings in (Compile, packageBin)).value.filter {
+    case (file, name) => !name.endsWith(".gitempty")
+  }
+  
+  filtered ++ Seq(
+    file("./factuality-models/README.md") -> "org/clulab/factuality/models/README.md",
+    file("./factuality-models/CHANGES.md") -> "org/clulab/factuality/models/CHANGES.md",
+    file("./factuality-models/LICENSE") -> "org/clulab/factuality/models/LICENSE"
+  )
+}
 
 publishArtifact in (Compile, packageBin) := true // Do include the resources.
 
